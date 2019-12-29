@@ -27,8 +27,7 @@ namespace Learning.Model.Entities {
     public int category_id { get; set; }
     public virtual category category { get; set; }
 
-
-    public virtual ICollection<purchase_item> Purchase_Items { get; set; }
+    public virtual ICollection<purchase_item> purchase_items { get; set; }
 
   }
 }

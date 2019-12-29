@@ -12,10 +12,9 @@ namespace Learning.ConsoleApp {
       Console.Title = "Learning.ConsoleApp";
 
       using (Context context = new Context()) {
-        foreach (category item in context.Categories) {
-          Console.WriteLine($" category_id { item.category_id } , name { item.name } ");
+        foreach (purchase_status item in context.Purchase_Statuses) {
+          Console.WriteLine($" purchase_status_id { item.purchase_status_id } , name { item.name }, description { item.description } ");
         }
-
       }
 
       Console.WriteLine("press any key ...");

@@ -32,7 +32,7 @@ namespace Learning.Model.Configurations {
       Property(p => p.insert_date)
           .IsRequired();
 
-      HasMany(p => p.Purchase_Items)
+      HasMany(p => p.purchase_items)
         .WithRequired(p => p.product)
         .HasForeignKey(p => p.product_id)
         .WillCascadeOnDelete(false);
