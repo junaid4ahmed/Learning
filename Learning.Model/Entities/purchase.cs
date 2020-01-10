@@ -28,26 +28,23 @@ namespace Learning.Model.Entities {
     //[RegularExpression(pattern: @"^[0-9]*$", ErrorMessage = "Only numbers are allowed in shipping fee")]
     public decimal shipping_fee { get; set; }
 
-    [Required]
-    [RegularExpression(pattern: @"^[0-9]*$", ErrorMessage = "Only numbers are allowed in shipping Id")]
-    public int supplier_id { get; set; }
-    public virtual supplier supplier { get; set; }
     public decimal Taxes { get; set; }
-
-    [DataType(DataType.Date)]
-    public DateTime? payment_date { get; set; }
-    public decimal payment_amount { get; set; }
-    public int payment_method_id { get; set; }
-    public payment_method payment_method { get; set; }
-
-
-    public int purchase_status_id { get; set; }
-    public purchase_status purchase_status { get; set; }
 
     [RegularExpression(pattern: @"^[a-zA-Z0-9 ]*$", ErrorMessage = "Only alphabets and numbers are allowed in notes")]
     [DataType(dataType: DataType.MultilineText)]
     public string notes { get; set; }
 
+    public virtual ICollection<payment> payments { get; set; }
+
+    [Required]
+    [RegularExpression(pattern: @"^[0-9]*$", ErrorMessage = "Only numbers are allowed in shipping Id")]
+    public int supplier_id { get; set; }
+    public virtual supplier supplier { get; set; }
+    public int status_id { get; set; }
+    // https://stackoverflow.com/questions/29414659/the-item-with-identity-x-already-exists-in-the-metadata-collection-how-do-i-f/45174778
+    //This bug happens when you use underscores in the name of your entities.The reason is Entity Framework also uses underscores to create the names of the keys(concatenating the entity and property names).
+    //change property status to purchase_status
+    public purchase_status purchase_status { get; set; }
     public virtual ICollection<purchase_item> purchase_items { get; set; }
 
   }

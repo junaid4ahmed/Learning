@@ -49,6 +49,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Configurations\category.cs" />
+    <Compile Include="Configurations\payment.cs" />
     <Compile Include="Configurations\payment_method.cs" />
     <Compile Include="Configurations\product.cs" />
     <Compile Include="Configurations\purchase.cs" />
@@ -57,6 +58,7 @@
     <Compile Include="Configurations\supplier.cs" />
     <Compile Include="Context.cs" />
     <Compile Include="Entities\category.cs" />
+    <Compile Include="Entities\payment.cs" />
     <Compile Include="Entities\payment_method.cs" />
     <Compile Include="Entities\product.cs" />
     <Compile Include="Entities\purchase.cs" />

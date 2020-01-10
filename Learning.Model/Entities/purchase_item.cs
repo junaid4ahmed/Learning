@@ -9,6 +9,6 @@
     public virtual product product { get; set; }
 
     public int quantity { get; set; }
-    public double unit_cast { get; set; }
+    public decimal unit_cast { get; set; }
   }
 }

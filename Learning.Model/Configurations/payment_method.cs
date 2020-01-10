@@ -12,17 +12,19 @@ namespace Learning.Model.Configurations {
 
     public payment_method() {
 
-      HasKey(p => new { p.payment_method_id });
+      HasKey(p => new { p.id });
 
-      Property(p => p.payment_method_id)
+      Property(p => p.id)
         .HasDatabaseGeneratedOption(DatabaseGeneratedOption.None);
 
-      // Name
+      
       Property(p => p.name)
           .IsRequired();
 
-      // payment_method and purchase
-      HasMany(p => p.purchases).WithRequired(p => p.payment_method).HasForeignKey(p => p.payment_method_id);
+      HasMany(p => p.payments)
+        .WithRequired(p => p.payment_method)
+        .HasForeignKey(p => p.payment_method_id)
+        .WillCascadeOnDelete(false);
 
     }
 

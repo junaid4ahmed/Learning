@@ -11,9 +11,9 @@ namespace Learning.Model.Configurations {
     : EntityTypeConfiguration<Entities.purchase_status> {
 
     public purchase_status() {
-      HasKey(p => new { p.purchase_status_id });
+      HasKey(p => new { p.id });
 
-      Property(p => p.purchase_status_id)
+      Property(p => p.id)
         .HasDatabaseGeneratedOption(DatabaseGeneratedOption.None);
 
       // Name
@@ -21,7 +21,10 @@ namespace Learning.Model.Configurations {
           .IsRequired();
 
       // payment_method and purchase
-      HasMany(p => p.purchases).WithRequired(p => p.purchase_status).HasForeignKey(p => p.purchase_status_id);
+      HasMany(p => p.purchases)
+        .WithRequired(p => p.purchase_status)
+        .HasForeignKey(p => p.status_id)
+        .WillCascadeOnDelete(false);
     }
   }
 }
