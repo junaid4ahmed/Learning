@@ -24,7 +24,7 @@ namespace Learning.ConsoleApp {
         };
         payment bank_transfers = new payment() {
           date = DateTime.Now,
-          amount = 500.50m,
+          amount = 5500.50m,
           payment_method_id = 4
         };
         ICollection<payment> payments = new List<payment> { cash_payment, bank_transfers };
@@ -36,7 +36,7 @@ namespace Learning.ConsoleApp {
         // payment is commence after receiving
         c1.ReceivedPurchase(1);
         c1.CreatePayment(purchase_id: 1, payments: payments);
-        // have made some changes from github
+        
 
         //purchases and their status along with total
         var purchases = _context.Purchases.Include(path: "purchase_status").Select(p => new { purchase_id = p.purchase_id, status = p.purchase_status.name, Total = p.purchase_items.Sum(s => (s.quantity * s.unit_cast)) });

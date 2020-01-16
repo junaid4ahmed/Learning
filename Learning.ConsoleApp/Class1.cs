@@ -167,7 +167,9 @@ namespace Learning.ConsoleApp {
           Console.WriteLine($"payment { total_payment }");
           Console.WriteLine($"purchase's payment { total_payment + remaning_purchase }");
           Console.WriteLine($"advance payment { remaning_purchase }");
-          
+          // simply add the payment to payment's collection of respective purchase
+          // set the status to payed as payment has completed
+          // remaning payment to respective purchaser's account
         }
 
         _context.SaveChanges();
