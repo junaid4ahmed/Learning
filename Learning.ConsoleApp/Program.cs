@@ -14,52 +14,73 @@ namespace Learning.ConsoleApp {
       Console.Title = "Learning.ConsoleApp";
       //Console.WriteLine($" ");
 
-      using (Context _context = new Context()) {
+      Reports.category r_category = new Reports.category();
+      Reports.supplier r_supplier = new Reports.supplier();
+      Reports.product r_product = new Reports.product();
+      Reports.purchase r_purchase = new Reports.purchase();
+      Reports.account r_account = new Reports.account();
+      Reports.post_type r_post_type = new Reports.post_type();
+      Reports.post r_post = new Reports.post();
 
-        //paying for purchase
-        payment cash_payment = new payment() {
-          date = DateTime.Now,
-          amount = 500.50m,
-          payment_method_id = 0
-        };
-        payment bank_transfers = new payment() {
-          date = DateTime.Now,
-          amount = 5500.50m,
-          payment_method_id = 4
-        };
-        ICollection<payment> payments = new List<payment> { cash_payment, bank_transfers };
-        
 
-        Class1 c1 = new Class1(_context);
-        //c1.CreateSupplier(); c1.CreateProducts(); c1.CreatePurchase();
+      DataAccess.category d_category = new DataAccess.category();
+      DataAccess.supplier d_supplier = new DataAccess.supplier();
+      DataAccess.product d_product = new DataAccess.product();
+      DataAccess.account d_account = new DataAccess.account();
+      DataAccess.post d_post = new DataAccess.post();
+      DataAccess.purchase d_purchase = new DataAccess.purchase();
 
-        // payment is commence after receiving
-        c1.ReceivedPurchase(1);
-        c1.CreatePayment(purchase_id: 1, payments: payments);
-        
+      //d_category.insert();
+      //d_supplier.insert();
+      //d_product.insert();
 
-        //purchases and their status along with total
-        var purchases = _context.Purchases.Include(path: "purchase_status").Select(p => new { purchase_id = p.purchase_id, status = p.purchase_status.name, Total = p.purchase_items.Sum(s => (s.quantity * s.unit_cast)) });
+      //d_account.insert(new Model.Entities.account() {
+      //  account_type_id = 0,
+      //  name = "New Account",
+      //  address = string.Empty,
+      //  phone = string.Empty,
+      //  register = DateTime.Now
+      //});
 
-        foreach (var item in purchases) {
-          Console.WriteLine($"purchase_id { item.purchase_id }, status { item.status } total { item.Total }");
-        }
+      //d_purchase.insert();
+      //d_post.insert(new post() {
+      //  log = DateTime.Now,
+      //  account_id = 1,
+      //  post_type_id = 0,
+      //  identifier = 1,
+      //  description = @"Purchase",
+      //  crebit = 4810.00M,
+      //  debit = 0.0M
+      //});
 
-        Console.WriteLine($" { _context.Purchases.FirstOrDefault().status_id } ");
-        decimal Total = _context.Purchases.FirstOrDefault().purchase_items.Sum(p => (p.quantity * p.unit_cast));
-        var Totals = _context.Purchases.Select(p => new { Id = p.purchase_id, Total = p.purchase_items.Sum(i => i.quantity * i.unit_cast) });
-        Console.WriteLine($" Total { Total } ");
-        foreach (var item in Totals) {
-          Console.WriteLine($"Id { item.Id } Total { item.Total } ");
-        }
-      }
+      r_category.select();
+      r_supplier.select();
+      r_product.select();
+      r_account.select();
+      r_purchase.select();
+
+      r_post.select();
+      r_post_type.select();
 
       Console.WriteLine("press any key ...");
       Console.ReadKey();
-
     }
 
 
+    static ICollection<payment> payments() {
+      payment cash_payment = new payment() {
+        date = DateTime.Now,
+        amount = 500.50m,
+        payment_method_id = 0
+      };
+      payment bank_transfers = new payment() {
+        date = DateTime.Now,
+        amount = 5500.50m,
+        payment_method_id = 4
+      };
+      ICollection<payment> payments = new List<payment> { cash_payment, bank_transfers };
+      return payments;
+    }
 
   }
 }

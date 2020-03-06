@@ -19,12 +19,6 @@ namespace Learning.Model.Configurations {
         .HasForeignKey(k => k.purchase_id)
         .WillCascadeOnDelete(false);
 
-
-      HasMany(p => p.payments)
-        .WithRequired(p => p.purchase)
-        .HasForeignKey(p => p.purchase_id)
-        .WillCascadeOnDelete(false);
-
     }
 
   }

@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace Learning.Model.Entities {
   public class purchase {
+
     public int purchase_id { get; set; }
 
     [DataType(DataType.Date)]
@@ -33,8 +34,6 @@ namespace Learning.Model.Entities {
     [RegularExpression(pattern: @"^[a-zA-Z0-9 ]*$", ErrorMessage = "Only alphabets and numbers are allowed in notes")]
     [DataType(dataType: DataType.MultilineText)]
     public string notes { get; set; }
-
-    public virtual ICollection<payment> payments { get; set; }
 
     [Required]
     [RegularExpression(pattern: @"^[0-9]*$", ErrorMessage = "Only numbers are allowed in shipping Id")]

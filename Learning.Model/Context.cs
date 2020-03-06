@@ -17,23 +17,32 @@ namespace Learning.Model {
 
       this.Configuration.ProxyCreationEnabled = true;
       Database.SetInitializer<Context>(new Initializer());
+
+      //Database.Log = Console.Write;
+
     }
 
+
+    public DbSet<Entities.post> Posts { get; set; }
+    public DbSet<Entities.post_type> Post_types { get; set; }
+    public DbSet<Entities.account_type> Account_Types { get; set; }
+    public DbSet<Entities.account> Accounts { get; set; }
     public DbSet<Entities.category> Categories { get; set; }
     public DbSet<Entities.product> Products { get; set; }
-
     public DbSet<Entities.purchase> Purchases { get; set; }
     public DbSet<Entities.purchase_status> Purchase_Statuses { get; set; }
     public DbSet<Entities.purchase_item> Purchase_Items { get; set; }
-
     public DbSet<Entities.payment> Payments { get; set; }
     public DbSet<Entities.payment_method> Payment_Methods { get; set; }
-
     public DbSet<Entities.supplier> Suppliers { get; set; }
-
     protected override void OnModelCreating(DbModelBuilder modelBuilder) {
 
       // Configuration
+      modelBuilder.Configurations.Add(new Configurations.post_type());
+      modelBuilder.Configurations.Add(new Configurations.post());
+      modelBuilder.Configurations.Add(new Configurations.account_type());
+      modelBuilder.Configurations.Add(new Configurations.account());
+
       modelBuilder.Configurations.Add(new Configurations.category());
       modelBuilder.Configurations.Add(new Configurations.product());
 
@@ -51,6 +60,7 @@ namespace Learning.Model {
 
       base.OnModelCreating(modelBuilder);
     }
+
   }
 
 }

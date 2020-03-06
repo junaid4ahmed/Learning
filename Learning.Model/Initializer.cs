@@ -8,6 +8,13 @@ namespace Learning.Model {
 
     protected override void Seed(Context context) {
 
+      // some account_type
+      List<Entities.account_type> account_types = new List<Entities.account_type>() {
+        new Entities.account_type(){ account_type_id = 0, name = "Expanses" },
+        new Entities.account_type(){ account_type_id = 1, name = "Income" }
+      };
+      account_types.ForEach(a => context.Account_Types.Add(a));
+
       // some categories
       List<Entities.category> categories = new List<Entities.category> {
         new Entities.category() { name = "Beverages", description = string.Empty }
@@ -70,6 +77,14 @@ namespace Learning.Model {
         new Entities.payment_method(){ id = 6, name = "Direct Deposit" }
       };
       payment_methods.ForEach(p => context.Payment_Methods.Add(p));
+
+      List<Entities.post_type> post_types = new List<Entities.post_type>() {
+        new Entities.post_type(){ post_type_id = 0, name = "Purchase" },
+        new Entities.post_type(){ post_type_id = 1, name = "Payment" },
+        new Entities.post_type(){ post_type_id = 2, name = "Recepit" },
+        new Entities.post_type(){ post_type_id = 3, name = "Sale" }
+      };
+      post_types.ForEach(p => context.Post_types.Add(p));
 
       base.Seed(context);
     }

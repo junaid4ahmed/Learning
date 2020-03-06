@@ -1,0 +1,47 @@
+  public class payment_suid
+    : base_class {
+    public void CreatePayment(int purchase_id, ICollection<payment> payments) {
+      purchase recorded_purchase = _context.Purchases.FirstOrDefault(p => p.purchase_id == purchase_id);
+      ICollection<payment> recorded_payments = recorded_purchase.payments;
+
+      decimal recorded_total_purchase = recorded_purchase.purchase_items.Sum(tp => (tp.quantity * tp.unit_cast));
+
+      if(recorded_payments != null) {
+        decimal recorded_total_payment = recorded_payments.Sum(tp => tp.amount);
+        decimal recorded_remaning_purchase = recorded_total_purchase - recorded_total_payment;
+
+        decimal total_payment = payments.Sum(pt => pt.amount);
+        decimal remaning_purchase = recorded_remaning_purchase - total_payment;
+
+        if(remaning_purchase > 0) {
+          Console.WriteLine($"remaning { recorded_remaning_purchase }");
+          Console.WriteLine($"payment { total_payment }");
+          Console.WriteLine($"after payment { remaning_purchase }");
+          // simply add the payment to payment's collection of respective purchase and respective leger
+          // set the status to paying as payment has not completed
+
+
+          recorded_purchase.status_id = 5;
+          foreach(payment item in payments) {
+            recorded_purchase.payments.Add(item);
+          }
+        }
+
+        if(remaning_purchase < 0) {
+          Console.WriteLine($"remaning { recorded_remaning_purchase }");
+          Console.WriteLine($"payment { total_payment }");
+          Console.WriteLine($"purchase's payment { total_payment + remaning_purchase }");
+          Console.WriteLine($"advance payment { remaning_purchase }");
+          // simply add the payment to payment's collection of respective purchase
+          // set the status to payed as payment has completed
+          // remaning payment to respective purchaser's account
+        }
+
+        _context.SaveChanges();
+
+      }
+    }
+
+
+
+  }

@@ -49,7 +49,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Class1.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -58,9 +57,17 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Learning.DataAccess\Learning.DataAccess.csproj">
+      <Project>{d0d927e5-4d86-40c3-bee1-f8cc4a752491}</Project>
+      <Name>Learning.DataAccess</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Learning.Model\Learning.Model.csproj">
       <Project>{9a523ebb-f56b-4ba4-8c0c-82bab67e6252}</Project>
       <Name>Learning.Model</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Learning.Reports\Learning.Reports.csproj">
+      <Project>{346bd36c-f3c4-45e6-8546-c7ddcd4a9821}</Project>
+      <Name>Learning.Reports</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
