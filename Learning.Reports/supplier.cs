@@ -14,7 +14,7 @@ namespace Learning.Reports {
       Console.WriteLine("suppliers");
       var suppliers = _context.Suppliers;
       foreach(Model.Entities.supplier item in suppliers) {
-        Console.WriteLine($" { item.company }, { item.business_phone } ");
+        Console.WriteLine($"-{ item.company }, { item.business_phone } ");
       }
     }
 

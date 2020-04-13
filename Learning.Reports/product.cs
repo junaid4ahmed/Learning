@@ -13,7 +13,7 @@ namespace Learning.Reports {
       Console.WriteLine("products");
       var products = _context.Products;
       foreach(Model.Entities.product item in products) {
-        Console.WriteLine($" { item.name }, { item.list_price } ");
+        Console.WriteLine($"-{ item.name }, { item.list_price } ");
       }
     }
 

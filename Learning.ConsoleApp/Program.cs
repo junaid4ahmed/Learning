@@ -14,73 +14,27 @@ namespace Learning.ConsoleApp {
       Console.Title = "Learning.ConsoleApp";
       //Console.WriteLine($" ");
 
-      Reports.category r_category = new Reports.category();
-      Reports.supplier r_supplier = new Reports.supplier();
-      Reports.product r_product = new Reports.product();
-      Reports.purchase r_purchase = new Reports.purchase();
-      Reports.account r_account = new Reports.account();
-      Reports.post_type r_post_type = new Reports.post_type();
-      Reports.post r_post = new Reports.post();
+      testData t = new testData();
+      //t.category_insert();
+      //t.supplier_insert();
+      //t.account_insert();
+      //t.product_insert();
 
+      //t.purchase_insert();
+      //t.purchase_item_insert();
+      //t.purchase_postInsert();
 
-      DataAccess.category d_category = new DataAccess.category();
-      DataAccess.supplier d_supplier = new DataAccess.supplier();
-      DataAccess.product d_product = new DataAccess.product();
-      DataAccess.account d_account = new DataAccess.account();
-      DataAccess.post d_post = new DataAccess.post();
-      DataAccess.purchase d_purchase = new DataAccess.purchase();
-
-      //d_category.insert();
-      //d_supplier.insert();
-      //d_product.insert();
-
-      //d_account.insert(new Model.Entities.account() {
-      //  account_type_id = 0,
-      //  name = "New Account",
-      //  address = string.Empty,
-      //  phone = string.Empty,
-      //  register = DateTime.Now
-      //});
-
-      //d_purchase.insert();
-      //d_post.insert(new post() {
-      //  log = DateTime.Now,
-      //  account_id = 1,
-      //  post_type_id = 0,
-      //  identifier = 1,
-      //  description = @"Purchase",
-      //  crebit = 4810.00M,
-      //  debit = 0.0M
-      //});
-
-      r_category.select();
-      r_supplier.select();
-      r_product.select();
-      r_account.select();
-      r_purchase.select();
-
-      r_post.select();
-      r_post_type.select();
+      //t.payment_insert();
+      //t.payment_postInsert(2);
+      //t.payment_postDelete(1);
+      //t.payment_postUpdate(2);
+      t.purchase_getStatus(1);
+      t.reports();
 
       Console.WriteLine("press any key ...");
       Console.ReadKey();
     }
 
-
-    static ICollection<payment> payments() {
-      payment cash_payment = new payment() {
-        date = DateTime.Now,
-        amount = 500.50m,
-        payment_method_id = 0
-      };
-      payment bank_transfers = new payment() {
-        date = DateTime.Now,
-        amount = 5500.50m,
-        payment_method_id = 4
-      };
-      ICollection<payment> payments = new List<payment> { cash_payment, bank_transfers };
-      return payments;
-    }
 
   }
 }

@@ -13,7 +13,7 @@ namespace Learning.Reports {
       Console.WriteLine("post_types");
       var post_types = _context.Post_types;
       foreach(Model.Entities.post_type item in post_types) {
-        Console.WriteLine($" { item.post_type_id }, { item.name } ");
+        Console.WriteLine($"-{ item.post_type_id }, { item.name } ");
       }
     }
 

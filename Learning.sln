@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Learning.DataAccess", "Lear
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Learning.Reports", "Learning.Reports\Learning.Reports.csproj", "{346BD36C-F3C4-45E6-8546-C7DDCD4A9821}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Learning.UnitTest", "Learning.UnitTest\Learning.UnitTest.csproj", "{507418D0-7B9F-4D1F-9A2E-646164967D30}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{346BD36C-F3C4-45E6-8546-C7DDCD4A9821}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{346BD36C-F3C4-45E6-8546-C7DDCD4A9821}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{346BD36C-F3C4-45E6-8546-C7DDCD4A9821}.Release|Any CPU.Build.0 = Release|Any CPU
+		{507418D0-7B9F-4D1F-9A2E-646164967D30}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{507418D0-7B9F-4D1F-9A2E-646164967D30}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{507418D0-7B9F-4D1F-9A2E-646164967D30}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{507418D0-7B9F-4D1F-9A2E-646164967D30}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

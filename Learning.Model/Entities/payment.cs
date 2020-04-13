@@ -12,5 +12,8 @@ namespace Learning.Model.Entities {
     public int payment_method_id { get; set; }
     public payment_method payment_method { get; set; }
 
+    public int account_id { get; set; }
+    public account account { get; set; }
+
   }
 }

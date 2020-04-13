@@ -18,5 +18,9 @@ namespace Learning.Model.Entities {
     public int account_type_id { get; set; }
     public account_type account_type { get; set; }
 
+    public virtual ICollection<post> posts { get; set; }
+    public ICollection<purchase> purchases { get; set; }
+    public ICollection<payment> payments { get; set; }
+
   }
 }

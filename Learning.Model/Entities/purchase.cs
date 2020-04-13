@@ -39,7 +39,12 @@ namespace Learning.Model.Entities {
     [RegularExpression(pattern: @"^[0-9]*$", ErrorMessage = "Only numbers are allowed in shipping Id")]
     public int supplier_id { get; set; }
     public virtual supplier supplier { get; set; }
+
+
+    public int account_id { get; set; }
+    public account account { get; set; }
     public int status_id { get; set; }
+
     // https://stackoverflow.com/questions/29414659/the-item-with-identity-x-already-exists-in-the-metadata-collection-how-do-i-f/45174778
     //This bug happens when you use underscores in the name of your entities.The reason is Entity Framework also uses underscores to create the names of the keys(concatenating the entity and property names).
     //change property status to purchase_status

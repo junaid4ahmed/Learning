@@ -12,14 +12,26 @@ namespace Learning.Reports {
 
     public void select() {
       Console.WriteLine("purchases");
+      var pur_col =
+      _context
+      .Purchases
+      .Include("purchase_items.product")
+      .Select(pur_sel => new {
+        id = pur_sel.purchase_id,
+        pur_sel.status_id,
+        sub_total = pur_sel.purchase_items.Count != 0 ? pur_sel.purchase_items.Sum(su => su.quantity * su.unit_cast) : 0.0m,
+        products = pur_sel.purchase_items.Select(ite_sel => new { id = ite_sel.purchase_item_id, ite_sel.product.name, ite_sel.quantity, ite_sel.unit_cast, total = (ite_sel.quantity * ite_sel.unit_cast) }),
+      });
 
-      var purchases = _context.Purchases.Include(path: "purchase_status")
-        .Select(p => new { purchase_id = p.purchase_id, status = p.purchase_status.name, Total = p.purchase_items.Sum(s => (s.quantity * s.unit_cast)) });
-
-      foreach(var item in purchases) {
-        Console.WriteLine($" { item.purchase_id }, { item.status }, { item.Total }");
+      foreach(var pur in pur_col) {
+        Console.WriteLine($"-{pur.id} {pur.status_id} {pur.sub_total}");
+        foreach(var ite in pur.products) {
+          Console.WriteLine($"--{ite.id } {ite.name} {ite.quantity} {ite.unit_cast} {ite.total}");
+        }
       }
+
     }
+
 
   }
 }

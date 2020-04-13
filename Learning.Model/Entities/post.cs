@@ -10,9 +10,11 @@ namespace Learning.Model.Entities {
 		public DateTime log { get; set; }
 		public int account_id { get; set; }
 		public account account { get; set; }
+
+		public int identifier { get; set; }
 		public int post_type_id { get; set; }
 		public post_type post_type { get; set; }
-		public int identifier { get; set; }
+	
 		public string description { get; set; }
 		public decimal crebit { get; set; }
 		public decimal debit { get; set; }
