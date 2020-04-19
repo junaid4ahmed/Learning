@@ -49,7 +49,7 @@ namespace Learning.DataAccess {
 
         shipping_fee = 0
       };
-
+      
       _context.Purchases.Add(temp);
       _context.SaveChanges();
     }

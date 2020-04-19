@@ -21,14 +21,23 @@ namespace Learning.ConsoleApp {
       //t.product_insert();
 
       //t.purchase_insert();
-      //t.purchase_item_insert();
-      //t.purchase_postInsert();
+
+      //t.purchaseitem_insert();
+      //t.purchaseitem_update();
+      //t.purchaseitem_delete(1, 1);
 
       //t.payment_insert();
+      //t.payment_update(2);
+
+      //t.purchase_postInsert(1);
+      //t.purchase_postUpdate(1);
+      //t.purchase_postDelete(1);
+
       //t.payment_postInsert(2);
-      //t.payment_postDelete(1);
+      //t.payment_postDelete(2);
       //t.payment_postUpdate(2);
-      t.purchase_getStatus(1);
+
+      t.purchase_setStatus(1, DataAccess.purchase_status.Approve);
       t.reports();
 
       Console.WriteLine("press any key ...");

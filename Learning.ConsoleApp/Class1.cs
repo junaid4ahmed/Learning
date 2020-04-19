@@ -141,14 +141,10 @@ namespace Learning.ConsoleApp {
       item.quantity = 10;
       d_purchase_Item.update(item);
     }
-    public void purchaseitem_delete(int purchase_id = 1, int product_id = 2) {
+    public void purchaseitem_delete(int purchase_id , int product_id) {
       d_purchase_Item.delete(purchase_id, product_id);
     }
     public void purchaseitem_insert(int purchase_id = 1) {
-
-      DataAccess.purchase_status status = purchase_getStatus(purchase_id);
-      if(status == DataAccess.purchase_status.New) { }
-      if(status == DataAccess.purchase_status.Submit) { }
 
       List<Model.Entities.purchase_item> items = new List<Model.Entities.purchase_item>() {
         new Model.Entities.purchase_item() {
@@ -172,27 +168,25 @@ namespace Learning.ConsoleApp {
       };
       items.ForEach(it => d_purchase_Item.insert(it));
     }
-
     #endregion
 
+    #region "purchase"
+    public void purchase_postDelete(int id) {
+      d_post.delete(post_type_id: (int)DataAccess.post_type.Purchase, identifier: id);
+    }
+    public void purchase_postUpdate(int id) {
+      d_post.update(
+        post_type_id: (int)DataAccess.post_type.Purchase,
+        identifier: id,
+        total: d_purchase.total(id)
+      );
+    }
+    public void purchase_setStatus(int purchase_id, DataAccess.purchase_status status_id) {
+      d_purchase.change_status(purchase_id, (int)status_id);
+    }
     public DataAccess.purchase_status purchase_getStatus(int purchase_id) {
       Model.Entities.purchase purchase = d_purchase.select(purchase_id);
       return (DataAccess.purchase_status)purchase.status_id;
-    }
-
-    #region "purchase"
-    public void purchase_postDelete() {
-      d_post.delete(post_type_id: (int)DataAccess.post_type.Purchase, identifier: 2);
-    }
-    public void purchase_postUpdate() {
-      d_post.update(
-        post_type_id: (int)DataAccess.post_type.Purchase,
-        identifier: 2,
-        total: d_purchase.total(2)
-      );
-    }
-    public void purchaseChangeStatus() {
-      d_purchase.change_status(purchase_id: 2, status_id: (int)DataAccess.purchase_status.Approve);
     }
     public void purchase_insert() {
       List<Model.Entities.purchase> purchases = new List<Model.Entities.purchase>() {
@@ -245,6 +239,11 @@ namespace Learning.ConsoleApp {
       payments.ForEach(p => d_payment.insert(p));
 
     }
+    public void payment_update(int id) {
+      Model.Entities.payment payment = d_payment.select(id);
+      payment.amount = 25;
+      d_payment.update(payment);
+    }
     public void payment_postInsert(int payment_id) {
       Model.Entities.payment p = d_payment.select(payment_id);
       d_post.insert(new Model.Entities.post() {
@@ -259,9 +258,9 @@ namespace Learning.ConsoleApp {
     }
     public void payment_postUpdate(int payment_id) {
       Model.Entities.payment payment = d_payment.select(payment_id);
-      if(payment != null) {
+      if (payment != null) {
         Model.Entities.post post = d_post.select((int)DataAccess.post_type.Payment, payment.id);
-        if(post != null) {
+        if (post != null) {
           post.debit = payment.amount;
           d_post.update(post);
         } else {
