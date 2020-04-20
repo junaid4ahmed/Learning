@@ -138,14 +138,19 @@ namespace Learning.ConsoleApp {
     #region "PurchaseItem"
     public void purchaseitem_update(int purchase_id = 1, int product_id = 1) {
       Model.Entities.purchase_item item = d_purchase_Item.select(purchase_id, product_id);
-      item.quantity = 10;
-      d_purchase_Item.update(item);
+      if (item != null) {
+        item.quantity = 10;
+        d_purchase_Item.update(item);
+
+        purchase_postUpdate(purchase_id);
+      }
     }
-    public void purchaseitem_delete(int purchase_id , int product_id) {
+    public void purchaseitem_delete(int purchase_id, int product_id) {
       d_purchase_Item.delete(purchase_id, product_id);
+
+      purchase_postUpdate(purchase_id);
     }
     public void purchaseitem_insert(int purchase_id = 1) {
-
       List<Model.Entities.purchase_item> items = new List<Model.Entities.purchase_item>() {
         new Model.Entities.purchase_item() {
           purchase_id = purchase_id,
@@ -167,6 +172,8 @@ namespace Learning.ConsoleApp {
         }
       };
       items.ForEach(it => d_purchase_Item.insert(it));
+
+      purchase_postUpdate(purchase_id);
     }
     #endregion
 
@@ -175,11 +182,18 @@ namespace Learning.ConsoleApp {
       d_post.delete(post_type_id: (int)DataAccess.post_type.Purchase, identifier: id);
     }
     public void purchase_postUpdate(int id) {
-      d_post.update(
-        post_type_id: (int)DataAccess.post_type.Purchase,
-        identifier: id,
-        total: d_purchase.total(id)
-      );
+
+      // storing the entity type we what to update in post aka leger
+      int purchase = (int)DataAccess.post_type.Purchase;
+
+      // get purchase from post aka leger
+      Model.Entities.post post = d_post.select(purchase, identifier: id);
+      if (post != null) {
+
+        // if exists update purchase in post aka leger
+        d_post.update(post_type_id: purchase, identifier: id, total: d_purchase.total(id));
+      }
+
     }
     public void purchase_setStatus(int purchase_id, DataAccess.purchase_status status_id) {
       d_purchase.change_status(purchase_id, (int)status_id);
@@ -189,11 +203,13 @@ namespace Learning.ConsoleApp {
       return (DataAccess.purchase_status)purchase.status_id;
     }
     public void purchase_insert() {
+      int status = (int)DataAccess.purchase_status.New;
+
       List<Model.Entities.purchase> purchases = new List<Model.Entities.purchase>() {
         new Model.Entities.purchase() {
           supplier_id = 1,
           account_id = 1,
-          status_id = (int)DataAccess.purchase_status.New,
+          status_id = status,
           expect_date = DateTime.Now.AddDays(15),
           insert_date = DateTime.Now,
           insert_by = "consoleApp",
@@ -207,16 +223,23 @@ namespace Learning.ConsoleApp {
       purchases.ForEach(pu => d_purchase.insert(pu));
     }
     public void purchase_postInsert(int purchase_id = 1) {
+      int post_type = (int)DataAccess.post_type.Purchase;
+
       Model.Entities.purchase p = d_purchase.select(purchase_id);
-      d_post.insert(new Model.Entities.post() {
-        log = DateTime.Now,
-        account_id = p.account_id,
-        identifier = p.purchase_id,
-        description = string.Empty,
-        post_type_id = (int)DataAccess.post_type.Purchase,
-        crebit = d_purchase.total(purchase_id),
-        debit = 0.0M
-      });
+      if (p != null) {
+        d_post.insert(new Model.Entities.post() {
+          log = DateTime.Now,
+          account_id = p.account_id,
+          identifier = p.purchase_id,
+          description = string.Empty,
+          post_type_id = post_type,
+          crebit = d_purchase.total(purchase_id),
+          debit = 0.0M
+        });
+      } else {
+        //log; operation failed; cannot find the require purchase
+      }
+
     }
     #endregion
 
@@ -241,8 +264,14 @@ namespace Learning.ConsoleApp {
     }
     public void payment_update(int id) {
       Model.Entities.payment payment = d_payment.select(id);
-      payment.amount = 25;
+      payment.amount = 252;
       d_payment.update(payment);
+
+      // update payment information in post if exists
+      payment_postUpdate(payment.id);
+    }
+    public void payment_delete(int id) {
+      d_payment.delete(id);
     }
     public void payment_postInsert(int payment_id) {
       Model.Entities.payment p = d_payment.select(payment_id);

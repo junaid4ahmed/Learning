@@ -13,10 +13,8 @@ namespace Learning.Model.Configurations {
     public purchase() {
       HasKey(p => new { p.purchase_id });
       Property(p => p.purchase_id).HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
-
-
-      HasMany(p => p.purchase_items).WithRequired(c => c.purchase).HasForeignKey(k => k.purchase_id).WillCascadeOnDelete(true);
-
+      HasMany(p => p.purchase_items).WithRequired(c => c.purchase).HasForeignKey(fk => fk.purchase_id).WillCascadeOnDelete(true);
+      HasMany(p => p.inventories).WithRequired(i => i.purchase).HasForeignKey(fk => fk.purchase_id).WillCascadeOnDelete(false);
     }
   }
 }

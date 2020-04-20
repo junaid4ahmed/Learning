@@ -8,9 +8,7 @@ namespace Learning.Reports {
   public class category 
     : parent {
 
-    public category() {
-
-    }
+    public category() { }
 
     public void select() {
       Console.WriteLine("categories");

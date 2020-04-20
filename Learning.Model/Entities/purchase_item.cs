@@ -10,5 +10,7 @@
 
     public int quantity { get; set; }
     public decimal unit_cast { get; set; }
+    public bool inventoried { get; set; }
+
   }
 }

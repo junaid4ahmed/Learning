@@ -51,6 +51,8 @@
     <Compile Include="Configurations\account.cs" />
     <Compile Include="Configurations\account_type.cs" />
     <Compile Include="Configurations\category.cs" />
+    <Compile Include="Configurations\inventory.cs" />
+    <Compile Include="Configurations\inventory_type.cs" />
     <Compile Include="Configurations\payment.cs" />
     <Compile Include="Configurations\payment_method.cs" />
     <Compile Include="Configurations\post.cs" />
@@ -64,6 +66,8 @@
     <Compile Include="Entities\account.cs" />
     <Compile Include="Entities\account_type.cs" />
     <Compile Include="Entities\category.cs" />
+    <Compile Include="Entities\inventory.cs" />
+    <Compile Include="Entities\inventory_type.cs" />
     <Compile Include="Entities\payment.cs" />
     <Compile Include="Entities\payment_method.cs" />
     <Compile Include="Entities\post.cs" />

@@ -7,8 +7,8 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Learning.Model.Configurations {
- public class product
-    : EntityTypeConfiguration<Entities.product> {
+  public class product
+     : EntityTypeConfiguration<Entities.product> {
 
     public product() {
       HasKey(p => new { p.product_id });
@@ -32,12 +32,9 @@ namespace Learning.Model.Configurations {
       Property(p => p.insert_date)
           .IsRequired();
 
-      HasMany(p => p.purchase_items)
-        .WithRequired(p => p.product)
-        .HasForeignKey(p => p.product_id)
-        .WillCascadeOnDelete(false);
+      HasMany(p => p.purchase_items).WithRequired(p => p.product).HasForeignKey(p => p.product_id).WillCascadeOnDelete(false);
+      HasMany(p => p.inventories).WithRequired(i => i.product).HasForeignKey(fk => fk.product_id).WillCascadeOnDelete(false);
 
     }
-
   }
 }

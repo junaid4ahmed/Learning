@@ -40,7 +40,6 @@ namespace Learning.Model.Entities {
     public int supplier_id { get; set; }
     public virtual supplier supplier { get; set; }
 
-
     public int account_id { get; set; }
     public account account { get; set; }
     public int status_id { get; set; }
@@ -50,7 +49,7 @@ namespace Learning.Model.Entities {
     //change property status to purchase_status
     public purchase_status purchase_status { get; set; }
     public virtual ICollection<purchase_item> purchase_items { get; set; }
+    public virtual ICollection<inventory> inventories { get; set; }
 
   }
-
 }

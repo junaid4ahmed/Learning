@@ -29,5 +29,6 @@ namespace Learning.Model.Entities {
 
     public virtual ICollection<purchase_item> purchase_items { get; set; }
 
+    public virtual ICollection<inventory> inventories { get; set; }
   }
 }

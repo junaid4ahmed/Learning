@@ -10,36 +10,25 @@ namespace Learning.DataAccess {
       Model.Entities.post post = _context.Posts.SingleOrDefault(p => (p.post_type_id == post_type_id & p.identifier == identifier));
       return post;
     }
-
     public void insert(Model.Entities.post post) {
       _context.Posts.Add(post);
       _context.SaveChanges();
     }
-
     public void update(Model.Entities.post post) {
       if (post != null) {
         _context.SaveChanges();
       }
     }
-
-    /// <summary>
-    /// call this method when you update purchase after post
-    /// </summary>
-    /// <param name="post_type_id">0 for purchase</param>
-    /// <param name="identifier">purchase_id for which you want to update price of purchase</param>
-    /// <param name="total">total price of purchase</param>
     public void update(int post_type_id, int identifier, decimal total) {
       Model.Entities.post temp = select(post_type_id, identifier);
       temp.crebit = total;
       _context.SaveChanges();
     }
-
     public void delete(int post_type_id, int identifier) {
       Model.Entities.post post = select(post_type_id, identifier);
       _context.Posts.Remove(post);
       _context.SaveChanges();
     }
-
     public void delete(Model.Entities.post post) {
       if (post != null) {
         Model.Entities.post temp = _context.Posts.Find(new object[] { post.post_id });
@@ -53,7 +42,6 @@ namespace Learning.DataAccess {
         }
       }
     }
-
     public bool exists(int post_type_id, int identifier) {
       bool result = false;
       Model.Entities.post post = select(post_type_id, identifier);

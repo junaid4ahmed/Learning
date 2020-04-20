@@ -22,7 +22,6 @@ namespace Learning.Model {
 
     }
 
-
     public DbSet<Entities.post> Posts { get; set; }
     public DbSet<Entities.post_type> Post_types { get; set; }
     public DbSet<Entities.account_type> Account_Types { get; set; }
@@ -32,9 +31,14 @@ namespace Learning.Model {
     public DbSet<Entities.purchase> Purchases { get; set; }
     public DbSet<Entities.purchase_status> Purchase_Statuses { get; set; }
     public DbSet<Entities.purchase_item> Purchase_Items { get; set; }
+
+    public DbSet<Entities.inventory_type> Inventory_Types { get; set; }
+    public DbSet<Entities.inventory> Inventories { get; set; }
+
     public DbSet<Entities.payment> Payments { get; set; }
     public DbSet<Entities.payment_method> Payment_Methods { get; set; }
     public DbSet<Entities.supplier> Suppliers { get; set; }
+
     protected override void OnModelCreating(DbModelBuilder modelBuilder) {
 
       // Configuration
@@ -49,6 +53,9 @@ namespace Learning.Model {
       modelBuilder.Configurations.Add(new Configurations.purchase());
       modelBuilder.Configurations.Add(new Configurations.purchase_status());
       modelBuilder.Configurations.Add(new Configurations.purchase_item());
+
+      modelBuilder.Configurations.Add(new Configurations.inventory_type());
+      modelBuilder.Configurations.Add(new Configurations.inventory());
 
       modelBuilder.Configurations.Add(new Configurations.payment());
       modelBuilder.Configurations.Add(new Configurations.payment_method());
