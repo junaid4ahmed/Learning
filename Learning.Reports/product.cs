@@ -15,6 +15,7 @@ namespace Learning.Reports {
       foreach(Model.Entities.product item in products) {
         Console.WriteLine($"-{ item.name }, { item.list_price } ");
       }
+      Console.WriteLine();
     }
 
   }

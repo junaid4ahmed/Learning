@@ -33,4 +33,11 @@ namespace Learning.DataAccess {
     DirectDeposit = 6
   }
 
+  public enum inventory_type {
+    Purchased = 0,
+    Sold = 1,
+    OnHold = 2,
+    Waste = 3
+  }
+
 }

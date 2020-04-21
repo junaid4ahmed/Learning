@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+
 namespace Learning.ConsoleApp {
   class Program {
 
@@ -14,7 +15,7 @@ namespace Learning.ConsoleApp {
       Console.Title = "Learning.ConsoleApp";
       //Console.WriteLine($" ");
 
-      testData t = new testData();
+      Controller t = new Controller();
       //t.category_insert();
       //t.supplier_insert();
       //t.account_insert();
@@ -26,8 +27,11 @@ namespace Learning.ConsoleApp {
       //t.purchaseitem_update(1, 3);
       //t.purchaseitem_delete(1, 1);
 
+      t.inventory_purchaseItemInsert(1, 1);
+      //t.inventory_purchaseItemDelete(1, 1);
+
       //t.payment_insert();
-      //t.payment_Delete();
+      //t.payment_delete(2);
       //t.payment_update(2);
 
       //t.purchase_postInsert(1);
@@ -35,6 +39,7 @@ namespace Learning.ConsoleApp {
       //t.purchase_postDelete(1);
 
       //t.payment_postInsert(1);
+      //t.payment_postInsert(2);
       //t.payment_postDelete(2);
       //t.payment_postUpdate(2);
 

@@ -20,6 +20,7 @@ namespace Learning.Reports {
       foreach(Model.Entities.payment item in payments) {
         Console.WriteLine($"--{item.id}, { item.account_id }, { item.payment_method.name }, { item.amount }  ");
       }
+      Console.WriteLine();
     }
 
   }

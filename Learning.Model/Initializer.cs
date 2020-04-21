@@ -86,13 +86,13 @@ namespace Learning.Model {
       };
       post_types.ForEach(p => context.Post_types.Add(p));
 
-      //List<Entities.inventory_type> inventory_Types = new List<Entities.inventory_type>() { 
-      //  new Entities.inventory_type(){ Id = 0, name = "Purchased", description = string.Empty },
-      //  new Entities.inventory_type(){ Id = 1, name = "Sold", description = string.Empty },
-      //  new Entities.inventory_type(){ Id = 2, name = "On Hold", description = string.Empty },
-      //  new Entities.inventory_type(){ Id = 3, name = "Waste", description = string.Empty }
-      //};
-      //inventory_Types.ForEach(it => context.Inventory_Types.Add(it));
+      List<Entities.inventory_type> inventory_Types = new List<Entities.inventory_type>() {
+        new Entities.inventory_type(){ Id = 0, name = "Purchased", description = string.Empty },
+        new Entities.inventory_type(){ Id = 1, name = "Sold", description = string.Empty },
+        new Entities.inventory_type(){ Id = 2, name = "On Hold", description = string.Empty },
+        new Entities.inventory_type(){ Id = 3, name = "Waste", description = string.Empty }
+      };
+      inventory_Types.ForEach(it => context.Inventory_Types.Add(it));
 
       base.Seed(context);
     }

@@ -5,8 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+
 namespace Learning.ConsoleApp {
-  public class testData {
+  public class Controller {
 
     #region "classes"
     private Reports.category r_category;
@@ -17,6 +18,8 @@ namespace Learning.ConsoleApp {
     private Reports.payment r_payment;
     private Reports.post_type r_post_type;
     private Reports.post r_post;
+    private Reports.inventory_type r_inventory_type;
+    private Reports.inventory r_inventory;
 
     private DataAccess.category d_category;
     private DataAccess.supplier d_supplier;
@@ -26,9 +29,10 @@ namespace Learning.ConsoleApp {
     private DataAccess.post d_post;
     private DataAccess.purchase d_purchase;
     private DataAccess.purchase_item d_purchase_Item;
+    private DataAccess.inventory d_inventory;
     #endregion
 
-    public testData() {
+    public Controller() {
       r_category = new Reports.category();
       r_supplier = new Reports.supplier();
       r_product = new Reports.product();
@@ -37,6 +41,8 @@ namespace Learning.ConsoleApp {
       r_payment = new Reports.payment();
       r_post_type = new Reports.post_type();
       r_post = new Reports.post();
+      r_inventory_type = new Reports.inventory_type();
+      r_inventory = new Reports.inventory();
 
       d_category = new DataAccess.category();
       d_supplier = new DataAccess.supplier();
@@ -46,6 +52,7 @@ namespace Learning.ConsoleApp {
       d_post = new DataAccess.post();
       d_purchase = new DataAccess.purchase();
       d_purchase_Item = new DataAccess.purchase_item();
+      d_inventory = new DataAccess.inventory();
     }
 
     #region "Insert Functions"
@@ -272,6 +279,7 @@ namespace Learning.ConsoleApp {
     }
     public void payment_delete(int id) {
       d_payment.delete(id);
+      payment_postDelete(id);
     }
     public void payment_postInsert(int payment_id) {
       Model.Entities.payment p = d_payment.select(payment_id);
@@ -286,9 +294,12 @@ namespace Learning.ConsoleApp {
       });
     }
     public void payment_postUpdate(int payment_id) {
+
+      int status = (int)DataAccess.post_type.Payment;
+
       Model.Entities.payment payment = d_payment.select(payment_id);
       if (payment != null) {
-        Model.Entities.post post = d_post.select((int)DataAccess.post_type.Payment, payment.id);
+        Model.Entities.post post = d_post.select(status, payment.id);
         if (post != null) {
           post.debit = payment.amount;
           d_post.update(post);
@@ -300,8 +311,36 @@ namespace Learning.ConsoleApp {
       }
     }
     public void payment_postDelete(int payment_id) {
-      d_post.delete((int)DataAccess.post_type.Payment, payment_id);
+      int status = (int)DataAccess.post_type.Payment;
+      Model.Entities.payment payment = d_payment.select(payment_id);
+      if (payment != null) {
+        d_post.delete(status, payment_id);
+      } else {
+        //log; no such payment is exists
+      }
     }
+    #endregion
+
+    #region "inventory"
+    public void inventory_purchaseItemInsert(int purchase_id, int product_id) {
+      Model.Entities.purchase_item temp = d_purchase_Item.select(purchase_id, product_id);
+      if (temp != null) {
+        d_inventory.insert(temp);
+      } else {
+        // log; purchase_item not found
+      }
+
+    }
+
+    public void inventory_purchaseItemDelete(int purchase_id, int product_id) {
+      Model.Entities.purchase_item temp = d_purchase_Item.select(purchase_id, product_id);
+      if (temp != null) {
+        d_inventory.delete(temp);
+      } else {
+        // log; purchase_item not found
+      }
+    }
+
     #endregion
 
     public void reports() {
@@ -311,6 +350,8 @@ namespace Learning.ConsoleApp {
       r_account.select();
       r_payment.select();
       r_purchase.select();
+      r_inventory_type.select();
+      r_inventory.select();
 
       r_post.select();
       r_post.Calculate();

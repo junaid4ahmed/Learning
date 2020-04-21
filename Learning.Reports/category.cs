@@ -16,12 +16,7 @@ namespace Learning.Reports {
       foreach(Model.Entities.category item in categories) {
         Console.WriteLine($"-{ item.category_id }, { item.name } ");
       }
+      Console.WriteLine();
     }
-
-    public void insert(Model.Entities.category category) {
-      _context.Categories.Add(category);
-      _context.SaveChanges();
-    }
-
   }
 }

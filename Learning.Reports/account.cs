@@ -20,8 +20,7 @@ namespace Learning.Reports {
           Console.WriteLine($"---{ purchase.purchase_id } { purchase.status_id } { purchase.insert_date } ");
         }
       }
+      Console.WriteLine();
     }
-
-
   }
 }

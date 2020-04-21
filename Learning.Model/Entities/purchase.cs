@@ -46,7 +46,9 @@ namespace Learning.Model.Entities {
 
     // https://stackoverflow.com/questions/29414659/the-item-with-identity-x-already-exists-in-the-metadata-collection-how-do-i-f/45174778
     //This bug happens when you use underscores in the name of your entities.The reason is Entity Framework also uses underscores to create the names of the keys(concatenating the entity and property names).
-    //change property status to purchase_status
+    // for example table name is "purchase" and property name is "status" when 
+    // entity frame concate it becone purchase_status and conflit with other table 
+    // which as same name as purchase_status
     public purchase_status purchase_status { get; set; }
     public virtual ICollection<purchase_item> purchase_items { get; set; }
     public virtual ICollection<inventory> inventories { get; set; }

@@ -51,6 +51,8 @@
   <ItemGroup>
     <Compile Include="account.cs" />
     <Compile Include="category.cs" />
+    <Compile Include="inventory.cs" />
+    <Compile Include="inventory_type.cs" />
     <Compile Include="parent.cs" />
     <Compile Include="payment.cs" />
     <Compile Include="post.cs" />

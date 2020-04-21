@@ -16,6 +16,7 @@ namespace Learning.Reports {
       foreach(Model.Entities.post item in posts) {
         Console.WriteLine($"-{ item.post_id } { item.account_id } { item.identifier } { item.post_type.name } { item.log } { item.crebit } { item.debit } ");
       }
+      Console.WriteLine();
     }
 
     public void Calculate() {
@@ -41,7 +42,7 @@ namespace Learning.Reports {
       foreach(object obj in objects) {
         Console.WriteLine($" { obj.ToString() } ");
       }
-
+      Console.WriteLine();
     }
 
   }

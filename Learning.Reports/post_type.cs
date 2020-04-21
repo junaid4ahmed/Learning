@@ -15,6 +15,7 @@ namespace Learning.Reports {
       foreach(Model.Entities.post_type item in post_types) {
         Console.WriteLine($"-{ item.post_type_id }, { item.name } ");
       }
+      Console.WriteLine();
     }
 
   }

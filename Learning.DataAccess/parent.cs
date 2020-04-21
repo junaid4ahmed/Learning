@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace Learning.DataAccess {
   public class parent {
-    protected readonly Context _context = null;
-    public parent() {
+    protected static Context _context = null;
+    static parent() {
       _context = new Context();
     }
   }
