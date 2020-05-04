@@ -39,7 +39,7 @@ namespace Learning.Reports {
         });
       }
 
-      foreach(object obj in objects) {
+      foreach(var obj in objects) {
         Console.WriteLine($" { obj.ToString() } ");
       }
       Console.WriteLine();

@@ -9,11 +9,8 @@ namespace Learning.DataAccess {
     New = 0,
     Submit = 1,
     Approve = 2,
-    Receiving = 3,
-    Received = 4,
-    Paying = 5,
-    Payed = 6,
-    Closed = 7
+    Receive = 3,
+    Closed = 4
   }
 
   public enum post_type {
@@ -31,6 +28,11 @@ namespace Learning.DataAccess {
     BankTransfers = 4,
     PrepaidCards = 5,
     DirectDeposit = 6
+  }
+
+  public enum account_type {
+    Expanses = 0,
+    Income = 1
   }
 
   public enum inventory_type {

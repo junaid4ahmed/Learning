@@ -6,113 +6,98 @@ using System.Threading.Tasks;
 
 namespace Learning.DataAccess {
   public class purchase
-    : parent {
+    : Base {
 
-    private ICollection<Model.Entities.purchase_item> CreatePurchaseItems() {
-      List<Model.Entities.purchase_item> purchaseItems = new List<Model.Entities.purchase_item>() {
-          new Model.Entities.purchase_item(){
-            product = _context.Products.SingleOrDefault(p => p.code == "NWTB-1" ),
-            quantity = 40,
-            unit_cast = 14
-          },
-          new Model.Entities.purchase_item(){
-            product = _context.Products.SingleOrDefault(p => p.code == "NWTB-34" ),
-            quantity = 60,
-            unit_cast = 10
-          },
-          new Model.Entities.purchase_item(){
-            product = _context.Products.SingleOrDefault(p => p.code == "NWTB-43" ),
-            quantity = 100,
-            unit_cast = 34
-          },
-          new Model.Entities.purchase_item(){
-            product = _context.Products.SingleOrDefault(p => p.code == "NWTB-81" ),
-            quantity = 125,
-            unit_cast = 2
-          },
-        };
-      return purchaseItems;
+    public Model.Entities.purchase select(int purchase_id) {
+      Model.Entities.purchase purchase = _context.Purchases.Find(new object[] { purchase_id });
+      return purchase;
     }
-    public void insert() {
-      Model.Entities.purchase temp = new Model.Entities.purchase() {
-        purchase_items = CreatePurchaseItems(),
-        supplier = _context.Suppliers.FirstOrDefault(),
-        account = _context.Accounts.FirstOrDefault(),
-        purchase_status = _context.Purchase_Statuses.Single(s => s.id == 0),
-        expect_date = DateTime.Now.AddDays(15),
-        insert_date = DateTime.Now,
-        insert_by = "consoleApp",
-        submit_date = null,
-        submit_by = string.Empty,
-        approve_date = null,
-        approve_by = string.Empty,
-
-        shipping_fee = 0
-      };
-      
-      _context.Purchases.Add(temp);
-      _context.SaveChanges();
-    }
-    public void insert(Model.Entities.purchase purchase) {
-      _context.Purchases.Add(purchase);
-      _context.SaveChanges();
-    }
-    public decimal total(int purchase_id) {
-      var temp = _context.Purchases.Find(new object[] { purchase_id });
-      decimal total = 0.0m;
-      total = temp.purchase_items.Count != 0 ? temp.purchase_items.Sum(pi => pi.quantity * pi.unit_cast) : 0.0m;
-      return total;
-    }
-    public Model.Entities.purchase select(int id) {
-      Model.Entities.purchase temp = _context.Purchases.Find(new object[] { id });
-      return temp;
-    }
-    public void delete(int id) {
-      _context.Purchases.Remove(select(id));
-      _context.SaveChanges();
+    public bool insert(Model.Entities.purchase purchase) {
+      bool result = false;
+      try {
+        _context.Purchases.Add(purchase);
+        _context.SaveChanges();
+        result = true;
+      } catch (System.Data.Entity.Infrastructure.DbUpdateException) {
+        // log error
+      }
+      return result;
     }
     public void update(Model.Entities.purchase purchase) {
       // update purchase in post as well such as total price
       _context.Entry(entity: purchase).State = System.Data.Entity.EntityState.Modified;
       _context.SaveChanges();
     }
-
-    /// <summary>
-    /// change the status of specific purchase specified with id
-    /// </summary>
-    /// <param name="purchase_id">purchase id</param>
-    /// <param name="status_id">status id</param>
-    public void change_status(int purchase_id, int status_id) {
+    public bool delete(int purchase_id) {
+      bool result = false;
+      Model.Entities.purchase purchase = select(purchase_id);
+      if (purchase != null) {
+        _context.Purchases.Remove(purchase);
+        _context.SaveChanges();
+        result = true;
+      } else {
+        // log; cannot find the purchase
+      }
+      return result;
+    }
+    public decimal total(int purchase_id) {
       var temp = select(purchase_id);
-      temp.status_id = status_id;
-      _context.SaveChanges();
+      decimal total = 0.0m;
+      total = temp.purchase_items.Count != 0 ? temp.purchase_items.Sum(pi => pi.quantity * pi.unit_cast) : 0.0m;
+      return total;
     }
-    public void SubmitPurchase(Model.Entities.purchase purchase) {
-      Model.Entities.purchase purchase_submit = _context.Purchases.SingleOrDefault(p => p.purchase_id == purchase.purchase_id);
-      purchase_submit.status_id = 1;
-      purchase_submit.submit_date = DateTime.Now;
-      purchase_submit.submit_by = "ConsoleApp";
-      _context.SaveChanges();
+    public bool submit(int purchase_id, DateTime submitDate, string submitBy) {
+      int submit = (int)DataAccess.purchase_status.Submit;
+      bool result = false;
+      Model.Entities.purchase p = select(purchase_id);
+      if (p != null) {
+        p.status_id = submit;
+        p.submit_date = submitDate;
+        p.submit_by = submitBy;
+        _context.SaveChanges();
+        result = true;
+      } else {
+        // log; cannot find the purchase
+      }
+      return result;
     }
-    public void ReceivingPurchase(Model.Entities.purchase purchase) {
-      Model.Entities.purchase purchase_submit = _context.Purchases.SingleOrDefault(p => p.purchase_id == purchase.purchase_id);
-      // Receving  Purchase
-      purchase_submit.status_id = 3;
-      _context.SaveChanges();
-    }
-    public void ReceivedPurchase(Model.Entities.purchase purchase) {
-      Model.Entities.purchase purchase_submit = _context.Purchases.SingleOrDefault(p => p.purchase_id == purchase.purchase_id);
-      // Received Purchase
-      purchase_submit.status_id = 4;
-      _context.SaveChanges();
-    }
-    public void ApprovePerchase(Model.Entities.purchase purchase) {
-      Model.Entities.purchase purchase_approve = _context.Purchases.SingleOrDefault(p => p.purchase_id == purchase.purchase_id);
-      purchase_approve.status_id = 2;
-      purchase_approve.submit_date = DateTime.Now;
-      purchase_approve.submit_by = "ConsoleApp";
-      _context.SaveChanges();
-    }
+    public bool approve(int purchase_id, DateTime approveDate, string approveBy) {
+      int approve = (int)DataAccess.purchase_status.Approve;
+      bool result = false;
 
+      Model.Entities.purchase p = select(purchase_id);
+      if (p != null) {
+        p.status_id = approve;
+        p.submit_date = approveDate;
+        p.submit_by = approveBy;
+        _context.SaveChanges();
+        result = true;
+      } else {
+        // log; cannot find the purchase
+      }
+      return result;
+    }
+    public bool receive(int purchase_id) {
+      bool result = false;
+      int receive = (int)purchase_status.Receive;
+      Model.Entities.purchase purchase = _context
+        .Purchases
+        .Include("purchase_items")
+        .SingleOrDefault(p => p.purchase_id == purchase_id);
+
+      if (purchase == null) {
+        return result;
+      }
+
+      bool exists = purchase.purchase_items.Any(pi => pi.inventoried == false);
+      if (exists == false) {
+        result = true;
+        purchase.status_id = receive;
+        _context.SaveChanges();
+      } else {
+        // log; there are item in purchase that need receiving
+      }
+      return result;
+    }
   }
 }

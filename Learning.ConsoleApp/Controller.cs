@@ -74,6 +74,9 @@ namespace Learning.ConsoleApp {
       };
       suppliers.ForEach(su => d_supplier.insert(su));
     }
+    #endregion
+
+    #region "product"
     public void product_insert() {
       List<Model.Entities.product> products = new List<Model.Entities.product>() {
         new Model.Entities.product() {
@@ -128,6 +131,25 @@ namespace Learning.ConsoleApp {
       products.ForEach(pr => d_product.insert(pr));
 
     }
+    public void product_update() {
+      Model.Entities.product product = new Model.Entities.product() {
+        product_id = 1,
+        category_id = 1,
+        code = "NWTB-1",
+        name = "Northwind Traders Chai",
+        recoder_level = 10,
+        traget_level = 40,
+        quantity_per_unit = "10 boxes x 20 bags",
+        standard_cast = 13.50m,
+        list_price = 18.00m,
+        discontinued = false,
+        insert_date = DateTime.Now
+      };
+      d_product.update(product);
+    }
+    #endregion
+
+    #region "account"   
     public void account_insert() {
       List<Model.Entities.account> accounts = new List<Model.Entities.account>() {
         new Model.Entities.account() {
@@ -140,25 +162,30 @@ namespace Learning.ConsoleApp {
       };
       accounts.ForEach(ac => d_account.insert(ac));
     }
+    public void account_update() {
+      Model.Entities.account account =
+        new Model.Entities.account() {
+          id = 1,
+          account_type_id = (int)DataAccess.account_type.Expanses,
+          name = $"New Account",
+          address = $"address",
+          phone = $"phone",
+          register = DateTime.Now
+        };
+      d_account.update(account);
+    }
     #endregion
 
     #region "PurchaseItem"
-    public void purchaseitem_update(int purchase_id = 1, int product_id = 1) {
-      Model.Entities.purchase_item item = d_purchase_Item.select(purchase_id, product_id);
-      if (item != null) {
-        item.quantity = 10;
-        d_purchase_Item.update(item);
+    public void purchaseitem_insert(int purchase_id) {
 
-        purchase_postUpdate(purchase_id);
-      }
-    }
-    public void purchaseitem_delete(int purchase_id, int product_id) {
-      d_purchase_Item.delete(purchase_id, product_id);
+      // get the purchase that you what to add purchase item to
+      Model.Entities.purchase purchase = d_purchase.select(purchase_id);
 
-      purchase_postUpdate(purchase_id);
-    }
-    public void purchaseitem_insert(int purchase_id = 1) {
-      List<Model.Entities.purchase_item> items = new List<Model.Entities.purchase_item>() {
+      if (purchase != null && purchase_status_IsNew_or_IsSubmit(purchase)) {
+
+        // start inserting purchase item here
+        List<Model.Entities.purchase_item> items = new List<Model.Entities.purchase_item>() {
         new Model.Entities.purchase_item() {
           purchase_id = purchase_id,
           product_id = 1,
@@ -178,37 +205,54 @@ namespace Learning.ConsoleApp {
           unit_cast = 46.00m
         }
       };
-      items.ForEach(it => d_purchase_Item.insert(it));
+        items.ForEach(it => { d_purchase_Item.insert(it); });
 
-      purchase_postUpdate(purchase_id);
-    }
-    #endregion
-
-    #region "purchase"
-    public void purchase_postDelete(int id) {
-      d_post.delete(post_type_id: (int)DataAccess.post_type.Purchase, identifier: id);
-    }
-    public void purchase_postUpdate(int id) {
-
-      // storing the entity type we what to update in post aka leger
-      int purchase = (int)DataAccess.post_type.Purchase;
-
-      // get purchase from post aka leger
-      Model.Entities.post post = d_post.select(purchase, identifier: id);
-      if (post != null) {
-
-        // if exists update purchase in post aka leger
-        d_post.update(post_type_id: purchase, identifier: id, total: d_purchase.total(id));
+      } else {
+        // log; cannot find require purchase
       }
 
     }
-    public void purchase_setStatus(int purchase_id, DataAccess.purchase_status status_id) {
-      d_purchase.change_status(purchase_id, (int)status_id);
+    public void purchaseitem_update(int purchase_id = 1, int product_id = 1) {
+
+      // get the item from respective purchase it exists
+      Model.Entities.purchase_item item = d_purchase_Item.select(purchase_id, product_id);
+
+      // update purchase item properties here
+      item.quantity = 36;
+
+      if (item != null) {
+        // get the purchase from respective purchase item it exists
+        Model.Entities.purchase purchase = d_purchase.select(item.purchase_id);
+
+        // purchase item of purchase with status "receive" and "approve" is not allowed to be updated
+        if (purchase != null && purchase_status_IsNew_or_IsSubmit(purchase)) {
+          d_purchase_Item.update(item);
+        }
+
+      }
     }
-    public DataAccess.purchase_status purchase_getStatus(int purchase_id) {
-      Model.Entities.purchase purchase = d_purchase.select(purchase_id);
-      return (DataAccess.purchase_status)purchase.status_id;
+    public void purchaseitem_delete(int purchase_id, int product_id) {
+
+      // get the respective purchase item from respective purchase
+      Model.Entities.purchase_item item = d_purchase_Item.select(purchase_id, product_id);
+
+      if (item != null) {
+
+        // get the purchase from respective purchase item it exists
+        Model.Entities.purchase purchase = d_purchase.select(item.purchase_id);
+
+        // purchase item of purchase with status "receive" and "approve" is not allowed to be updated
+        if (purchase != null && purchase_status_IsNew_or_IsSubmit(purchase)) {
+          // delete it from respective purchase
+          d_purchase_Item.delete(item);
+        }
+
+
+      }
     }
+    #endregion
+
+    #region "purchase"    
     public void purchase_insert() {
       int status = (int)DataAccess.purchase_status.New;
 
@@ -229,11 +273,40 @@ namespace Learning.ConsoleApp {
       };
       purchases.ForEach(pu => d_purchase.insert(pu));
     }
+    public void purchase_delete(int purchase_id) {
+      // delete purchase's post's entry if any before deleting it
+      // from inventory and purchase's items itself
+      d_post.delete(post_type_id: (int)DataAccess.post_type.Purchase, identifier: purchase_id);
+      d_purchase.delete(purchase_id);
+    }
+    public void purchase_postDelete(int id) {
+      d_post.delete(post_type_id: (int)DataAccess.post_type.Purchase, identifier: id);
+    }
+    public void purchase_postUpdate(int purchase_id) {
+
+      // storing the entity type we what to update in post aka leger
+      int purchase_status = (int)DataAccess.post_type.Purchase;
+
+      // get purchase from post aka leger if exists
+      Model.Entities.post post = d_post.select(purchase_status, identifier: purchase_id);
+      if (post != null) {
+
+        Model.Entities.purchase purchase = d_purchase.select(purchase_id);
+        if (purchase != null && purchase_status_isReceive(purchase)) {
+          // if exists update purchase in post aka leger
+          d_post.update(post_type_id: purchase_status, identifier: purchase_id, total: d_purchase.total(purchase_id));
+
+        }
+
+      }
+
+    }
     public void purchase_postInsert(int purchase_id = 1) {
       int post_type = (int)DataAccess.post_type.Purchase;
 
+      // only purchase that have status "receive" is added to post
       Model.Entities.purchase p = d_purchase.select(purchase_id);
-      if (p != null) {
+      if (p != null && purchase_status_isReceive(p)) {
         d_post.insert(new Model.Entities.post() {
           log = DateTime.Now,
           account_id = p.account_id,
@@ -244,9 +317,63 @@ namespace Learning.ConsoleApp {
           debit = 0.0M
         });
       } else {
-        //log; operation failed; cannot find the require purchase
+        // log; operation failed; cannot find the require purchase 
+        // or purchase's status is not reveive
       }
+    }
+    public void purchase_submit(int purchase_id) {
+      d_purchase.submit(purchase_id, DateTime.Now, "ConsoleApp");
+    }
+    public void purchase_approve(int purchase_id) {
+      d_purchase.approve(purchase_id, DateTime.Now, "ConsoleApp");
+    }
 
+    private bool purchase_status_IsApprove_or_IsReceive(Model.Entities.purchase purchase) {
+
+      // storing stats value for purchase's status for later use
+      int receive_status = (int)DataAccess.purchase_status.Receive;
+      int approve_status = (int)DataAccess.purchase_status.Approve;
+
+      // purchase must not be null and it's status must not be "receive" and "approve" 
+      // to add purchase item to it
+      bool condition =
+        purchase.status_id == receive_status ||
+        purchase.status_id == approve_status;
+
+      return condition;
+    }
+    private bool purchase_status_IsNew_or_IsSubmit(Model.Entities.purchase purchase) {
+
+      // storing stats value for purchase's status for later use
+      int new_status = (int)DataAccess.purchase_status.New;
+      int submit_status = (int)DataAccess.purchase_status.Submit;
+      // purchase must not be null and it's status must not be "receive" and "approve" 
+      // to add purchase item to it
+      bool condition =
+        purchase.status_id == submit_status ||
+        purchase.status_id == new_status;
+
+      return condition;
+    }
+    private bool purchase_status_IsApprove(Model.Entities.purchase purchase) {
+      // storing stats value for purchase's status for later use
+      int approve_status = (int)DataAccess.purchase_status.Approve;
+
+
+      bool condition =
+        purchase.status_id == approve_status;
+
+      return condition;
+
+    }
+    private bool purchase_status_isReceive(Model.Entities.purchase purchase) {
+      // storing stats value for purchase's status for later use
+      int receive_status = (int)DataAccess.purchase_status.Receive;
+
+      bool condition =
+        purchase.status_id == receive_status;
+
+      return condition;
     }
     #endregion
 
@@ -255,13 +382,13 @@ namespace Learning.ConsoleApp {
       Model.Entities.payment cash_payment = new Model.Entities.payment() {
         account_id = account_id,
         date = DateTime.Now,
-        amount = 500.50m,
+        amount = 25.50m,
         payment_method_id = 0
       };
       Model.Entities.payment bank_transfers = new Model.Entities.payment() {
         account_id = account_id,
         date = DateTime.Now,
-        amount = 5500.50m,
+        amount = 250.50m,
         payment_method_id = 4
       };
       List<Model.Entities.payment> payments = new List<Model.Entities.payment> { cash_payment, bank_transfers };
@@ -323,24 +450,52 @@ namespace Learning.ConsoleApp {
 
     #region "inventory"
     public void inventory_purchaseItemInsert(int purchase_id, int product_id) {
+
+      // get the respective purchase item from respective purchase
       Model.Entities.purchase_item temp = d_purchase_Item.select(purchase_id, product_id);
+
       if (temp != null) {
-        d_inventory.insert(temp);
+
+        // get the purchase for that purchase item
+        Model.Entities.purchase purchase = d_purchase.select(temp.purchase_id);
+
+        // once purchase is not null and its status is "approve" 
+        // you can start inserting purchase item in inventory
+        if (purchase != null && purchase_status_IsApprove(purchase)) {
+
+          // add item to inventory and set its inventoried bit to true
+          d_inventory.insert(temp);
+
+          // set purchase's status to receive when all items in that purchase are received 
+          d_purchase.receive(purchase_id);
+
+        } else {
+          // log; cannot file the purchase
+        }
+
       } else {
         // log; purchase_item not found
       }
 
     }
-
     public void inventory_purchaseItemDelete(int purchase_id, int product_id) {
+
+      // check for PurchaseItem that it belongs to respective purchase or not
       Model.Entities.purchase_item temp = d_purchase_Item.select(purchase_id, product_id);
+
+      // get the purchase for that purchase item
+      Model.Entities.purchase purchase = d_purchase.select(temp.purchase_id);
+
+      // once found delete it from inventory if exists
       if (temp != null) {
-        d_inventory.delete(temp);
+        if (purchase != null && purchase_status_IsApprove(purchase)) {
+          d_inventory.delete(temp);
+        }
+
       } else {
         // log; purchase_item not found
       }
     }
-
     #endregion
 
     public void reports() {
@@ -350,15 +505,11 @@ namespace Learning.ConsoleApp {
       r_account.select();
       r_payment.select();
       r_purchase.select();
-      r_inventory_type.select();
       r_inventory.select();
 
       r_post.select();
       r_post.Calculate();
-      r_post_type.select();
-
 
     }
-
   }
 }

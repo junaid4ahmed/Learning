@@ -63,6 +63,10 @@
     <Compile Include="supplier.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Learning.DataAccess\Learning.DataAccess.csproj">
+      <Project>{d0d927e5-4d86-40c3-bee1-f8cc4a752491}</Project>
+      <Name>Learning.DataAccess</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Learning.Model\Learning.Model.csproj">
       <Project>{9a523ebb-f56b-4ba4-8c0c-82bab67e6252}</Project>
       <Name>Learning.Model</Name>

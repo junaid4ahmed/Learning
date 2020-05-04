@@ -9,6 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Learning.ConsoleApp", "Lear
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{83C2A0B3-4A28-4184-868F-DC6A88E374D7}"
 	ProjectSection(SolutionItems) = preProject
+		Documents.md = Documents.md
 		temp.txt = temp.txt
 		TextFile1.txt = TextFile1.txt
 	EndProjectSection

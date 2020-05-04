@@ -11,7 +11,7 @@ namespace Learning.Model.Configurations {
       HasKey(c => new { c.id });
       Property(propertyExpression: c => c.id).HasDatabaseGeneratedOption(DatabaseGeneratedOption.Identity);
       Property(c => c.name).IsRequired().HasColumnAnnotation(IndexAnnotation.AnnotationName, new IndexAnnotation(new IndexAttribute() { IsUnique = true }));
-      HasMany(a => a.posts).WithRequired(po => po.account).HasForeignKey(fk => fk.account_id).WillCascadeOnDelete(true);
+      HasMany(a => a.posts).WithRequired(po => po.account).HasForeignKey(fk => fk.account_id).WillCascadeOnDelete(false);
       HasMany(a => a.purchases).WithRequired(p => p.account).HasForeignKey(fk => fk.account_id).WillCascadeOnDelete(false);
       HasMany(a => a.payments).WithRequired(p => p.account).HasForeignKey(fk => fk.account_id).WillCascadeOnDelete(false);
     }

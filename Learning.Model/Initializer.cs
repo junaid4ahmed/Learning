@@ -40,26 +40,11 @@ namespace Learning.Model {
         },
         new Entities.purchase_status() {
           id = 3,
-          name = "receiving",
-          description = "set by system upon partial receiving"
+          name = "receive",
+          description = "is assigned after all items in purchase is received by authority"
         },
         new Entities.purchase_status() {
           id = 4,
-          name = "received",
-          description = "set by system upon full receiving"
-        },
-        new Entities.purchase_status() {
-          id = 5,
-          name = "paying",
-          description = "set by system upon full receiving"
-        },
-        new Entities.purchase_status() {
-          id = 6,
-          name = "payd",
-          description = "set by system upon full receiving"
-        },
-        new Entities.purchase_status() {
-          id = 7,
           name = "closed",
           description = "is assiged when purchase have completed it life cycle"
         },
@@ -96,5 +81,6 @@ namespace Learning.Model {
 
       base.Seed(context);
     }
+
   }
 }

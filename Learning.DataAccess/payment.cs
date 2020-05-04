@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Learning.DataAccess {
   public class payment 
-    : parent {
+    : Base {
 
     public payment() { }
     public Model.Entities.payment select(int id) {
