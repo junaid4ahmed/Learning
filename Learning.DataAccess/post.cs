@@ -22,10 +22,26 @@ namespace Learning.DataAccess {
       }
       return result;
     }
-    public void update(Model.Entities.post post) {
+    public bool update(Model.Entities.post p) {
+      bool result = false;
+      Model.Entities.post post = select(p.post_type_id, p.identifier);
       if (post != null) {
-        _context.SaveChanges();
+        try {
+          post.post_type_id = p.post_type_id;
+          post.account_id = p.account_id;
+          post.log = p.log;
+
+          post.crebit = p.crebit;
+          post.debit = p.debit;
+          post.description = p.description;
+
+          _context.SaveChanges();
+        } catch (System.Data.Entity.Infrastructure.DbUpdateException) {
+          // log; cannot update the post
+        }
+        // log; cannot find the require post 
       }
+      return result;
     }
     public bool update(int post_type_id, int identifier, decimal total) {
       bool result = false;

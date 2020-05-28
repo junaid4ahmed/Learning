@@ -26,9 +26,7 @@ namespace Learning.Model.Entities {
     public DateTime insert_date { get; set; }
     public int category_id { get; set; }
     public virtual category category { get; set; }
-
     public virtual ICollection<purchase_item> purchase_items { get; set; }
-
     public virtual ICollection<inventory> inventories { get; set; }
   }
 }

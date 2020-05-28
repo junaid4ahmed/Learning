@@ -11,10 +11,10 @@ namespace Learning.Reports {
     public post() { }
 
     public void select() {
-      var posts = _context.Posts.Include("post_type");
+      var posts = _context.Posts;
       Console.WriteLine($"Posts");
-      foreach(Model.Entities.post item in posts) {
-        Console.WriteLine($"-{ item.post_id } { item.account_id } { item.identifier } { item.post_type.name } { item.log } { item.crebit } { item.debit } ");
+      foreach (Model.Entities.post item in posts) {
+        Console.WriteLine($"-{ item.post_id } { item.account_id } { item.identifier } { Enum.GetName(typeof(DataAccess.post_type), item.post_type_id) } { item.log } { item.crebit } { item.debit } ");
       }
       Console.WriteLine();
     }
@@ -24,14 +24,14 @@ namespace Learning.Reports {
       decimal balance = 0;
       List<object> objects = new List<object>();
 
-      foreach(Model.Entities.post item in posts) {
+      foreach (Model.Entities.post item in posts) {
         balance = balance + item.crebit - item.debit;
         objects.Add(new {
           item.post_id,
-          item.log,
-          item.account_id,
-          item.post_type_id,
           item.identifier,
+          type = Enum.GetName(typeof(DataAccess.post_type), item.post_type_id),
+          item.account_id,
+          item.log,
           item.description,
           item.crebit,
           item.debit,
@@ -39,7 +39,7 @@ namespace Learning.Reports {
         });
       }
 
-      foreach(var obj in objects) {
+      foreach (var obj in objects) {
         Console.WriteLine($" { obj.ToString() } ");
       }
       Console.WriteLine();

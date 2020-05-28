@@ -1,4 +1,5 @@
 ﻿
+using Learning.DataAccess;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -154,10 +155,10 @@ namespace Learning.ConsoleApp {
       List<Model.Entities.account> accounts = new List<Model.Entities.account>() {
         new Model.Entities.account() {
           account_type_id = 0,
-          name = "New Account",
+          name = "New Account Three",
           address = string.Empty,
           phone = string.Empty,
-          register = DateTime.Now
+          register = DateTime.Parse("06-Apr-20")
         }
       };
       accounts.ForEach(ac => d_account.insert(ac));
@@ -165,12 +166,12 @@ namespace Learning.ConsoleApp {
     public void account_update() {
       Model.Entities.account account =
         new Model.Entities.account() {
-          id = 1,
+          id = 2,
           account_type_id = (int)DataAccess.account_type.Expanses,
-          name = $"New Account",
+          name = $"New Account One",
           address = $"address",
           phone = $"phone",
-          register = DateTime.Now
+          register = DateTime.Parse("01-May-20")
         };
       d_account.update(account);
     }
@@ -218,7 +219,7 @@ namespace Learning.ConsoleApp {
       Model.Entities.purchase_item item = d_purchase_Item.select(purchase_id, product_id);
 
       // update purchase item properties here
-      item.quantity = 36;
+      item.quantity = 525;
 
       if (item != null) {
         // get the purchase from respective purchase item it exists
@@ -259,7 +260,7 @@ namespace Learning.ConsoleApp {
       List<Model.Entities.purchase> purchases = new List<Model.Entities.purchase>() {
         new Model.Entities.purchase() {
           supplier_id = 1,
-          account_id = 1,
+          account_id = 3,
           status_id = status,
           expect_date = DateTime.Now.AddDays(15),
           insert_date = DateTime.Now,
@@ -279,8 +280,8 @@ namespace Learning.ConsoleApp {
       d_post.delete(post_type_id: (int)DataAccess.post_type.Purchase, identifier: purchase_id);
       d_purchase.delete(purchase_id);
     }
-    public void purchase_postDelete(int id) {
-      d_post.delete(post_type_id: (int)DataAccess.post_type.Purchase, identifier: id);
+    public void purchase_postDelete(int purchase_id) {
+      d_post.delete(post_type_id: (int)DataAccess.post_type.Purchase, identifier: purchase_id);
     }
     public void purchase_postUpdate(int purchase_id) {
 
@@ -302,9 +303,10 @@ namespace Learning.ConsoleApp {
 
     }
     public void purchase_postInsert(int purchase_id = 1) {
-      int post_type = (int)DataAccess.post_type.Purchase;
+      int purchase_post_type = (int)DataAccess.post_type.Purchase;
 
-      // only purchase that have status "receive" is added to post
+      // only purchase that have status "receive" is added to post 
+      // only once purchase is added
       Model.Entities.purchase p = d_purchase.select(purchase_id);
       if (p != null && purchase_status_isReceive(p)) {
         d_post.insert(new Model.Entities.post() {
@@ -312,12 +314,12 @@ namespace Learning.ConsoleApp {
           account_id = p.account_id,
           identifier = p.purchase_id,
           description = string.Empty,
-          post_type_id = post_type,
+          post_type_id = purchase_post_type,
           crebit = d_purchase.total(purchase_id),
           debit = 0.0M
         });
       } else {
-        // log; operation failed; cannot find the require purchase 
+        // log; operation failed; purchase is already posted
         // or purchase's status is not reveive
       }
     }
@@ -379,63 +381,78 @@ namespace Learning.ConsoleApp {
 
     #region "payment"
     public void payment_insert(int account_id = 1) {
+      int cash_type = (int)DataAccess.payment_method.Cash;
+      int bank_type = (int)DataAccess.payment_method.BankTransfers;
+
       Model.Entities.payment cash_payment = new Model.Entities.payment() {
         account_id = account_id,
         date = DateTime.Now,
         amount = 25.50m,
-        payment_method_id = 0
+        payment_method_id = cash_type
       };
       Model.Entities.payment bank_transfers = new Model.Entities.payment() {
         account_id = account_id,
         date = DateTime.Now,
         amount = 250.50m,
-        payment_method_id = 4
+        payment_method_id = bank_type
       };
       List<Model.Entities.payment> payments = new List<Model.Entities.payment> { cash_payment, bank_transfers };
 
       payments.ForEach(p => d_payment.insert(p));
 
     }
-    public void payment_update(int id) {
-      Model.Entities.payment payment = d_payment.select(id);
-      payment.amount = 252;
-      d_payment.update(payment);
+    public void payment_update(int payment_id) {
+      int cash = (int)DataAccess.payment_method.Cash;
+      Model.Entities.payment p = new Model.Entities.payment() {
+        account_id = 1,
+        id = payment_id,
+        payment_method_id = cash,
+        date = DateTime.Parse("5-May-20"),
+        amount = 5555.55m,
+      };
+
+      d_payment.update(p);
 
       // update payment information in post if exists
-      payment_postUpdate(payment.id);
+      int post_type = (int)DataAccess.post_type.Payment;
+      Model.Entities.post post = new Model.Entities.post() {
+        post_type_id = post_type,
+        identifier = p.id,
+        account_id = p.account_id,
+        log = DateTime.Parse("7-May-20"),
+        crebit = 0.0m,
+        debit = p.amount,
+        description = $"payment { p.amount } in cash"
+      };
+
+      d_post.update(post);
     }
-    public void payment_delete(int id) {
-      d_payment.delete(id);
-      payment_postDelete(id);
+    public void payment_delete(int payment_id) {
+      // delete it from post if exists
+      int payment = (int)DataAccess.post_type.Payment;
+      d_post.delete(payment, payment_id);
+      d_payment.delete(payment_id);
     }
     public void payment_postInsert(int payment_id) {
       Model.Entities.payment p = d_payment.select(payment_id);
-      d_post.insert(new Model.Entities.post() {
-        log = DateTime.Now,
-        account_id = p.account_id,
-        identifier = p.id,
-        description = string.Empty,
-        post_type_id = (int)DataAccess.post_type.Payment,
-        crebit = 0.0M,
-        debit = p.amount
-      });
-    }
-    public void payment_postUpdate(int payment_id) {
 
-      int status = (int)DataAccess.post_type.Payment;
+      int ty_payment = (int)DataAccess.post_type.Payment;
 
-      Model.Entities.payment payment = d_payment.select(payment_id);
-      if (payment != null) {
-        Model.Entities.post post = d_post.select(status, payment.id);
-        if (post != null) {
-          post.debit = payment.amount;
-          d_post.update(post);
-        } else {
-          //log; no such payment is exists in post
-        }
-      } else {
-        //log; no such payment is made
+      Model.Entities.post post = d_post.select(ty_payment, payment_id);
+
+      if (p != null && post == null) {
+        d_post.insert(new Model.Entities.post() {
+          log = DateTime.Now,
+          account_id = p.account_id,
+          identifier = p.id,
+          description = string.Empty,
+          post_type_id = ty_payment,
+          crebit = 0.0M,
+          debit = p.amount
+        });
       }
+
+
     }
     public void payment_postDelete(int payment_id) {
       int status = (int)DataAccess.post_type.Payment;
@@ -451,20 +468,43 @@ namespace Learning.ConsoleApp {
     #region "inventory"
     public void inventory_purchaseItemInsert(int purchase_id, int product_id) {
 
-      // get the respective purchase item from respective purchase
-      Model.Entities.purchase_item temp = d_purchase_Item.select(purchase_id, product_id);
+      // get the respective purchase item from respective purchase_id
+      Model.Entities.purchase_item purchase_Item = d_purchase_Item.select(purchase_id, product_id);
 
-      if (temp != null) {
+      if (purchase_Item != null) {
 
         // get the purchase for that purchase item
-        Model.Entities.purchase purchase = d_purchase.select(temp.purchase_id);
+        Model.Entities.purchase purchase = d_purchase.select(purchase_Item.purchase_id);
 
-        // once purchase is not null and its status is "approve" 
-        // you can start inserting purchase item in inventory
-        if (purchase != null && purchase_status_IsApprove(purchase)) {
+        // check for purchase is not null 
+        bool NotNullPurchase = purchase != null;
 
-          // add item to inventory and set its inventoried bit to true
-          d_inventory.insert(temp);
+        // check its status is "approve" 
+        bool PurchaseStatusIsApprove = purchase_status_IsApprove(purchase);
+
+        // check if that purchase item is not already exists in inventory
+        bool NotInInventory = d_inventory.select(purchase_id, product_id) == null;
+
+        // start inserting item in invetory
+        if (NotNullPurchase && PurchaseStatusIsApprove && NotInInventory) {
+
+          // add purchase item to inventory  
+          Model.Entities.inventory inventory = new Model.Entities.inventory() {
+            product_id = purchase_Item.product_id,
+            purchase_id = purchase_Item.purchase_id,
+            quantity = purchase_Item.quantity,
+            price = purchase_Item.unit_cast,
+            inventory_type_id = (int)inventory_type.Purchased,
+            log = DateTime.Now,
+            modift = DateTime.Now
+          };
+          bool success = d_inventory.insert(inventory);
+
+          // set new added purchase_item inventoried bit to true
+          if (success) {
+            purchase_Item.inventoried = true;
+            d_purchase_Item.update(purchase_Item);
+          }
 
           // set purchase's status to receive when all items in that purchase are received 
           d_purchase.receive(purchase_id);
@@ -502,14 +542,13 @@ namespace Learning.ConsoleApp {
       r_category.select();
       r_supplier.select();
       r_product.select();
-      r_account.select();
-      r_payment.select();
+      r_account.select(); 
       r_purchase.select();
       r_inventory.select();
+      r_payment.select();
 
       r_post.select();
       r_post.Calculate();
-
     }
   }
 }

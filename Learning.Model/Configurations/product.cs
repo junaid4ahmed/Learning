@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Data.Entity.Infrastructure.Annotations;
 using System.Data.Entity.ModelConfiguration;
 using System.Linq;
 using System.Text;
@@ -18,19 +19,20 @@ namespace Learning.Model.Configurations {
 
       // Name
       Property(p => p.name)
-          .IsRequired();
+        .IsRequired()
+        .HasColumnAnnotation(IndexAnnotation.AnnotationName, new IndexAnnotation(new IndexAttribute() { IsUnique = true }));
 
       //  StandardCast
       Property(p => p.standard_cast)
-          .IsRequired();
+        .IsRequired();
 
       //  ListPrice
       Property(p => p.list_price)
-          .IsRequired();
+        .IsRequired();
 
       // Date
       Property(p => p.insert_date)
-          .IsRequired();
+        .IsRequired();
 
       HasMany(p => p.purchase_items).WithRequired(p => p.product).HasForeignKey(p => p.product_id).WillCascadeOnDelete(false);
       HasMany(p => p.inventories).WithRequired(i => i.product).HasForeignKey(fk => fk.product_id).WillCascadeOnDelete(false);

@@ -13,11 +13,11 @@ namespace Learning.Reports {
     public void select() {
       var accounts = _context.Accounts.Include(path: "purchases");
       Console.WriteLine($"accounts");
-      foreach(Model.Entities.account account in accounts) {
+      foreach (Model.Entities.account account in accounts) {
         Console.WriteLine($"-{ account.id } { account.name }");
         Console.WriteLine($"--purchases");
-        foreach(Model.Entities.purchase purchase in account.purchases) {
-          Console.WriteLine($"---{ purchase.purchase_id } { purchase.status_id } { purchase.insert_date } ");
+        foreach (Model.Entities.purchase purchase in account.purchases) {
+          Console.WriteLine($"---{ purchase.purchase_id } { Enum.GetName(typeof(DataAccess.purchase_status), purchase.status_id) } { purchase.insert_date } ");
         }
       }
       Console.WriteLine();

@@ -14,34 +14,22 @@ namespace Learning.DataAccess {
     }
 
     public Model.Entities.inventory select(int purchase_id, int product_id) {
-      Model.Entities.inventory temp = 
+      Model.Entities.inventory temp =
         _context.Inventories.SingleOrDefault(i => i.purchase_id == purchase_id && i.product_id == product_id);
       return temp;
     }
 
-    public void insert(Model.Entities.purchase_item item) {
-      int purchase = (int)inventory_type.Purchased;
-      // make sure purchase_item doesn't exist in inventory already
-      Model.Entities.inventory temp = select(item.purchase_id, item.product_id);
+    public bool insert(Model.Entities.inventory inventory) {
 
-      if (temp == null) {
-        Model.Entities.inventory inventory = new Model.Entities.inventory() {
-          product_id = item.product_id,
-          purchase_id = item.purchase_id,
-          quantity = item.quantity,
-          price = item.unit_cast,
-          inventory_type_id = purchase,
-          log = DateTime.Now,
-          modift = DateTime.Now
-        };
+      bool result = false;
+      try {
         _context.Inventories.Add(inventory);
-        
-        // set purchase_item inventoried property to true upon insert into inventory
-        item.inventoried = true;
         _context.SaveChanges();
-      } else {
-        // log; purchase_item already exists
+        result = true;
+      } catch (System.Data.Entity.Infrastructure.DbUpdateException) {
+        // log; cannot insert inventory
       }
+      return result;
     }
 
     public bool update(Model.Entities.purchase_item item) {
