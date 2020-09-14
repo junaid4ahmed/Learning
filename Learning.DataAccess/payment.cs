@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity.Infrastructure;
+using System.Data.Entity.Validation;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,36 +16,49 @@ namespace Learning.DataAccess {
       Model.Entities.payment temp = _context.Payments.Find(new object[] { id });
       return temp;
     }
-    public void insert(Model.Entities.payment payment) {
-      _context.Payments.Add(payment);
-      _context.SaveChanges();
-    }
-    public bool update(Model.Entities.payment payment) {
+    public bool insert(Model.Entities.payment payment) {
       bool result = false;
-      Model.Entities.payment temp = _context.Payments.SingleOrDefault(p => p.id == payment.id);
-      if (temp != null) {
-        try {
-          temp.amount = payment.amount;
-          temp.date = payment.date;
-          temp.account_id = payment.account_id;
-          temp.payment_method_id = payment.payment_method_id;
-          _context.SaveChanges();
-          result = true;
-        } catch (System.Data.Entity.Infrastructure.DbUpdateException) {
-          // log; cannot update
-        }
-        // log; cannot file the payment
+      try {
+        _context.Payments.Add(payment);
+        _context.SaveChanges();
+        result = true;
+      } catch (DbUpdateException exc) {
+        Debug.Write($" cannot insert payment in payment's collection");
+        Debug.Write(exc.InnerException.InnerException.Message);
       }
       return result;
     }
-    public void delete(int id) {
-      Model.Entities.payment temp = select(id);
-      if (temp != null) {
-        _context.Payments.Remove(temp);
+    public bool update(Model.Entities.payment payment) {
+      bool result = false;
+      try {
+        _context.Entry(entity: payment).State = System.Data.Entity.EntityState.Modified;
         _context.SaveChanges();
-      } else {
-        // log; delete; payment not found
+        result = true;
+      } catch (DbEntityValidationException exc) {
+        Debug.WriteLine($" cannot update payment in payment's collection");
+        foreach (DbEntityValidationResult errors in exc.EntityValidationErrors) {
+          foreach (DbValidationError item in errors.ValidationErrors) {
+            Debug.WriteLine($"{ item.PropertyName }");
+            Debug.WriteLine($"{ item.ErrorMessage }");
+          }
+        }
+      } catch (DbUpdateException exc) {
+        Debug.WriteLine($" cannot update payment in payment's collection");
+        Debug.WriteLine($"{  exc.InnerException.InnerException.Message }");
       }
+      return result;
+    }
+    public bool delete(Model.Entities.payment payment) {
+      bool result = false;
+      try {
+        _context.Payments.Remove(payment);
+        _context.SaveChanges();
+        result = true;
+      } catch (DbUpdateException exc) {
+        Debug.WriteLine($" cannot delete payment in payment's collection");
+        Debug.WriteLine($"{ exc.InnerException.InnerException.Message }");
+      }
+      return result;
     }
 
   }

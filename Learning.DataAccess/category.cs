@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity.Infrastructure;
+using System.Data.Entity.Validation;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,36 +23,49 @@ namespace Learning.DataAccess {
         _context.Categories.Add(category);
         _context.SaveChanges();
         result = true;
-      } catch (System.Data.Entity.Infrastructure.DbUpdateException) {
-        // log; cannot insert the category
+      } catch (DbEntityValidationException exc) {
+        Debug.WriteLine($"cannot insert category in category's collection");
+        foreach (DbEntityValidationResult errors in exc.EntityValidationErrors) {
+          foreach (DbValidationError item in errors.ValidationErrors) {
+            Debug.WriteLine($"{ item.PropertyName }");
+            Debug.WriteLine($"{ item.ErrorMessage }");
+          }
+        }
+      } catch (DbUpdateException exc) {
+        Debug.WriteLine($"cannot insert category in category's collection");
+        Debug.WriteLine($"{exc.InnerException.InnerException.Message}");
       }
       return result;
     }
     public bool update(Model.Entities.category category) {
       bool result = false;
-      Model.Entities.category temp = select(category.category_id);
-      if (temp != null) {
-        try {
-          temp.name = category.name;
-          temp.description = category.description;
-          _context.SaveChanges();
-        } catch (System.Data.Entity.Infrastructure.DbUpdateException) {
-          // log; error occur while updating the category;
+      try {
+        _context.Entry(category).State = System.Data.Entity.EntityState.Modified;
+        _context.SaveChanges();
+        result = true;
+      } catch (DbEntityValidationException exc) {
+        Debug.WriteLine($"cannot update category in category's collection");
+        foreach (DbEntityValidationResult errors in exc.EntityValidationErrors) {
+          foreach (DbValidationError item in errors.ValidationErrors) {
+            Debug.WriteLine($"{ item.PropertyName }");
+            Debug.WriteLine($"{ item.ErrorMessage }");
+          }
         }
-      } else {
-        // log; cannot find the category for updating
+      } catch (DbUpdateException exc) {
+        Debug.WriteLine($"cannot update category in category's collection");
+        Debug.WriteLine(exc.InnerException.InnerException.Message);
       }
       return result;
     }
-    public bool delect(int category_id) {
+    public bool delect(Model.Entities.category category) {
       bool result = false;
-      Model.Entities.category category = select(category_id);
-      if (category != null) {
+      try {
         _context.Categories.Remove(category);
         _context.SaveChanges();
         result = true;
-      } else {
-        // log; cannot find the category
+      } catch (DbUpdateException exc) {
+        Debug.WriteLine($"cannot delete category in category's collection");
+        Debug.WriteLine($"{exc.InnerException.InnerException.Message}");
       }
       return result;
     }

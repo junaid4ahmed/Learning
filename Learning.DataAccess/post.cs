@@ -1,13 +1,16 @@
 ﻿
 using System;
+using System.Data.Entity.Infrastructure;
+using System.Data.Entity.Validation;
+using System.Diagnostics;
 using System.Linq;
 
 namespace Learning.DataAccess {
   public class post
     : Base {
 
-    public Model.Entities.post select(int post_type_id, int identifier) {
-      Model.Entities.post post = _context.Posts.SingleOrDefault(p => (p.post_type_id == post_type_id & p.identifier == identifier));
+    public Model.Entities.post select(int type_id, int identifier) {
+      Model.Entities.post post = _context.Posts.SingleOrDefault(p => (p.post_type_id == type_id & p.identifier == identifier));
       return post;
     }
     public bool insert(Model.Entities.post post) {
@@ -16,87 +19,52 @@ namespace Learning.DataAccess {
         _context.Posts.Add(post);
         _context.SaveChanges();
         result = true;
-      } catch (System.Data.Entity.Infrastructure.DbUpdateException) {
-        // log; cannot insert purchase
-
-      }
-      return result;
-    }
-    public bool update(Model.Entities.post p) {
-      bool result = false;
-      Model.Entities.post post = select(p.post_type_id, p.identifier);
-      if (post != null) {
-        try {
-          post.post_type_id = p.post_type_id;
-          post.account_id = p.account_id;
-          post.log = p.log;
-
-          post.crebit = p.crebit;
-          post.debit = p.debit;
-          post.description = p.description;
-
-          _context.SaveChanges();
-        } catch (System.Data.Entity.Infrastructure.DbUpdateException) {
-          // log; cannot update the post
-        }
-        // log; cannot find the require post 
-      }
-      return result;
-    }
-    public bool update(int post_type_id, int identifier, decimal total) {
-      bool result = false;
-      Model.Entities.post post = select(post_type_id, identifier);
-      if (post != null) {
-        try {
-          post.crebit = total;
-          _context.SaveChanges();
-          result = true;
-        } catch (System.Data.Entity.Infrastructure.DbUpdateException) {
-          // log; cannot update the purchase in post
-        }
-      } else {
-        // log; cannot find the required purchase post
-      }
-      return result;
-    }
-    public bool delete(int post_type_id, int identifier) {
-      bool result = false;
-      Model.Entities.post post = select(post_type_id, identifier);
-      if (post != null) {
-        try {
-          _context.Posts.Remove(post);
-          _context.SaveChanges();
-          result = true;
-        } catch (System.Data.Entity.Infrastructure.DbUpdateException) {
-          // log; cannot update post
-        }
-      } else {
-        // log; cannot find the post to delete
-      }
-      return result;
-    }
-    public void delete(Model.Entities.post post) {
-      if (post != null) {
-        Model.Entities.post temp = _context.Posts.Find(new object[] { post.post_id });
-        if (temp != null) {
-          try {
-            _context.Posts.Remove(temp);
-            _context.SaveChanges();
-          } catch (Exception) {
-            throw;
+      } catch (DbEntityValidationException exc) {
+        Debug.WriteLine($"cannot update account in account's collection");
+        foreach (DbEntityValidationResult errors in exc.EntityValidationErrors) {
+          foreach (DbValidationError item in errors.ValidationErrors) {
+            Debug.WriteLine($"{ item.PropertyName }");
+            Debug.WriteLine($"{ item.ErrorMessage }");
           }
         }
+      } catch (DbUpdateException exc) {
+        Debug.WriteLine($" cannot insert post in post's collection");
+        Debug.WriteLine(exc.InnerException.InnerException.Message);
       }
+      return result;
     }
-    public bool exists(int post_type_id, int identifier) {
+    public bool update(Model.Entities.post post) {
       bool result = false;
-      Model.Entities.post post = select(post_type_id, identifier);
-      if (post != null) {
+      try {
+        _context.Entry(post).State = System.Data.Entity.EntityState.Modified;
+        _context.SaveChanges();
         result = true;
+      } catch (DbEntityValidationException exc) {
+        Debug.WriteLine($"cannot update post in post's collection");
+        foreach (DbEntityValidationResult errors in exc.EntityValidationErrors) {
+          foreach (DbValidationError item in errors.ValidationErrors) {
+            Debug.WriteLine($"{ item.PropertyName }");
+            Debug.WriteLine($"{ item.ErrorMessage }");
+          }
+        }
+      } catch (DbUpdateException exc) {
+        Debug.WriteLine($"cannot update post in post's collection");
+        Debug.WriteLine(exc.InnerException.InnerException.Message);
+      }
+      return result;
+    }
+    public bool delete(Model.Entities.post post) {
+      bool result = false;
+      try {
+        _context.Posts.Remove(post);
+        _context.SaveChanges();
+        result = true;
+      } catch (DbUpdateException exc) {
+        Debug.WriteLine($"cannot delete post in post's collection");
+        Debug.WriteLine($"{exc.InnerException.InnerException.Message}");
       }
       return result;
     }
 
   }
-
 }

@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Data.Entity.Infrastructure;
+using System.Data.Entity.Validation;
+using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Learning.DataAccess {
   public class purchase
@@ -18,28 +18,54 @@ namespace Learning.DataAccess {
         _context.Purchases.Add(purchase);
         _context.SaveChanges();
         result = true;
-      } catch (System.Data.Entity.Infrastructure.DbUpdateException) {
-        // log error
+      } catch (DbEntityValidationException exc) {
+        Debug.WriteLine($"cannot insert purchase in purchase's collection");
+        foreach (DbEntityValidationResult errors in exc.EntityValidationErrors) {
+          foreach (DbValidationError item in errors.ValidationErrors) {
+            Debug.WriteLine($"{ item.PropertyName }");
+            Debug.WriteLine($"{ item.ErrorMessage }");
+          }
+        }
+      } catch (DbUpdateException exc) {
+        Debug.WriteLine($"cannot insert purchase in purchase's collection");
+        Debug.WriteLine(exc.InnerException.InnerException.Message);
       }
       return result;
     }
-    public void update(Model.Entities.purchase purchase) {
-      // update purchase in post as well such as total price
-      _context.Entry(entity: purchase).State = System.Data.Entity.EntityState.Modified;
-      _context.SaveChanges();
-    }
-    public bool delete(int purchase_id) {
+    public bool update(Model.Entities.purchase purchase) {
       bool result = false;
-      Model.Entities.purchase purchase = select(purchase_id);
-      if (purchase != null) {
+      try {
+        _context.Entry(purchase).State = System.Data.Entity.EntityState.Modified;
+        _context.SaveChanges();
+        result = true;
+      } catch (DbEntityValidationException exc) {
+        Debug.WriteLine($"cannot update purchase in purchase's collection");
+        foreach (DbEntityValidationResult errors in exc.EntityValidationErrors) {
+          foreach (DbValidationError item in errors.ValidationErrors) {
+            Debug.WriteLine($"{ item.PropertyName }");
+            Debug.WriteLine($"{ item.ErrorMessage }");
+          }
+        }
+      } catch (DbUpdateException exc) {
+        Debug.WriteLine($"cannot update purchase in purchase's collection");
+        Debug.WriteLine(exc.InnerException.InnerException.Message);
+      }
+
+      return result;
+    }
+    public bool delete(Model.Entities.purchase purchase) {
+      bool result = false;
+      try {
         _context.Purchases.Remove(purchase);
         _context.SaveChanges();
         result = true;
-      } else {
-        // log; cannot find the purchase
+      } catch (DbUpdateException exc) {
+        Debug.WriteLine($"cannot delete purchase in purchase's collection");
+        Debug.WriteLine($"{exc.InnerException.InnerException.Message}");
       }
       return result;
     }
+  
     public decimal total(int purchase_id) {
       var temp = select(purchase_id);
       decimal total = 0.0m;
@@ -57,7 +83,7 @@ namespace Learning.DataAccess {
         _context.SaveChanges();
         result = true;
       } else {
-        // log; cannot find the purchase
+        Debug.WriteLine($"cannot find purchase in purchase's collection");
       }
       return result;
     }
@@ -73,7 +99,7 @@ namespace Learning.DataAccess {
         _context.SaveChanges();
         result = true;
       } else {
-        // log; cannot find the purchase
+        Debug.WriteLine($"cannot find purchase in purchase's collection");
       }
       return result;
     }
@@ -99,5 +125,6 @@ namespace Learning.DataAccess {
       }
       return result;
     }
+
   }
 }

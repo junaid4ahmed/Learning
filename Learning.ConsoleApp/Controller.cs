@@ -2,6 +2,7 @@
 using Learning.DataAccess;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -57,12 +58,28 @@ namespace Learning.ConsoleApp {
     }
 
     #region "Insert Functions"
+
     public void category_insert() {
       List<Model.Entities.category> categories = new List<Model.Entities.category> {
         new Model.Entities.category() { name = "Beverages", description = string.Empty }
       };
       categories.ForEach(ca => d_category.insert(ca));
     }
+
+    public void category_update() {
+      // get a category from categories collection
+      Model.Entities.category category = d_category.select(1);
+      if (category != null) {
+        d_category.delect(category);
+      } else {
+        Debug.WriteLine($"cannot find category to update in categories collection");
+      }
+    }
+
+    #endregion
+
+    #region "supplier"
+
     public void supplier_insert() {
       List<Model.Entities.supplier> suppliers = new List<Model.Entities.supplier>() {
         new Model.Entities.supplier() {
@@ -75,6 +92,31 @@ namespace Learning.ConsoleApp {
       };
       suppliers.ForEach(su => d_supplier.insert(su));
     }
+
+    public void supplier_update() {
+      Model.Entities.supplier supplier = d_supplier.select(1);
+      if (supplier != null) {
+        supplier.first_name = $"Sophie";
+        supplier.last_name = $"Dee";
+        supplier.company = $"Sophie Dee Supplier";
+        supplier.email = $"Sophie@gmail.com";
+        supplier.business_phone = $"+123255860384";
+
+
+        //supplier.home_phone;
+        //supplier.address;
+        //supplier.city;
+        //supplier.state;
+        //supplier.zip;
+        //supplier.notes;
+
+        d_supplier.update(supplier);
+      } else {
+        Debug.WriteLine($"cannot find supplier in supplier's collection ");
+      }
+
+    }
+
     #endregion
 
     #region "product"
@@ -138,7 +180,7 @@ namespace Learning.ConsoleApp {
         category_id = 1,
         code = "NWTB-1",
         name = "Northwind Traders Chai",
-        recoder_level = 10,
+        recoder_level = 20,
         traget_level = 40,
         quantity_per_unit = "10 boxes x 20 bags",
         standard_cast = 13.50m,
@@ -164,16 +206,24 @@ namespace Learning.ConsoleApp {
       accounts.ForEach(ac => d_account.insert(ac));
     }
     public void account_update() {
-      Model.Entities.account account =
-        new Model.Entities.account() {
-          id = 2,
-          account_type_id = (int)DataAccess.account_type.Expanses,
-          name = $"New Account One",
-          address = $"address",
-          phone = $"phone",
-          register = DateTime.Parse("01-May-20")
-        };
-      d_account.update(account);
+
+      Model.Entities.account account = new Model.Entities.account() {
+        account_type_id = 0, // expanses account
+        id = 1,
+        name = $"New Account",
+        address = $" Al-Faruq G.T Road ",
+        phone = $" +92-323-5860323 ",
+        register = DateTime.Parse("14-Sep-20")
+      };
+
+      if (account != null) {
+
+        d_account.update(account);
+      } else {
+        Debug.WriteLine($"cannot update account");
+      }
+
+
     }
     #endregion
 
@@ -187,6 +237,7 @@ namespace Learning.ConsoleApp {
 
         // start inserting purchase item here
         List<Model.Entities.purchase_item> items = new List<Model.Entities.purchase_item>() {
+
         new Model.Entities.purchase_item() {
           purchase_id = purchase_id,
           product_id = 1,
@@ -205,6 +256,7 @@ namespace Learning.ConsoleApp {
           quantity = 2,
           unit_cast = 46.00m
         }
+
       };
         items.ForEach(it => { d_purchase_Item.insert(it); });
 
@@ -260,7 +312,7 @@ namespace Learning.ConsoleApp {
       List<Model.Entities.purchase> purchases = new List<Model.Entities.purchase>() {
         new Model.Entities.purchase() {
           supplier_id = 1,
-          account_id = 3,
+          account_id = 1,
           status_id = status,
           expect_date = DateTime.Now.AddDays(15),
           insert_date = DateTime.Now,
@@ -275,34 +327,67 @@ namespace Learning.ConsoleApp {
       purchases.ForEach(pu => d_purchase.insert(pu));
     }
     public void purchase_delete(int purchase_id) {
-      // delete purchase's post's entry if any before deleting it
-      // from inventory and purchase's items itself
-      d_post.delete(post_type_id: (int)DataAccess.post_type.Purchase, identifier: purchase_id);
-      d_purchase.delete(purchase_id);
+
+      // purchase can only be deleted with status "submit"
+      // you cannot delete a purchase with status "received"
+      Model.Entities.purchase purchase = d_purchase.select(purchase_id);
+      if (purchase != null) {
+        d_purchase.delete(purchase);
+      } else {
+        System.Diagnostics.Debug.WriteLine($"cannot find the purchase to delete in purchase colleciton");
+      }
+
     }
     public void purchase_postDelete(int purchase_id) {
-      d_post.delete(post_type_id: (int)DataAccess.post_type.Purchase, identifier: purchase_id);
+
+      // storing post type
+      int post_type = (int)DataAccess.post_type.Purchase;
+
+      // get post entry from post collection
+      Model.Entities.post post = d_post.select(post_type, purchase_id);
+
+      if (post != null) {
+        d_post.delete(post);
+      } else {
+        Debug.WriteLine($" cannot find the post in post's collection ");
+      }
+
     }
     public void purchase_postUpdate(int purchase_id) {
 
-      // storing the entity type we what to update in post aka leger
-      int purchase_status = (int)DataAccess.post_type.Purchase;
+      // get a purchase against purchase_id provided
+      Model.Entities.purchase pur = d_purchase.select(purchase_id);
 
-      // get purchase from post aka leger if exists
-      Model.Entities.post post = d_post.select(purchase_status, identifier: purchase_id);
-      if (post != null) {
+      if (pur != null) {
 
-        Model.Entities.purchase purchase = d_purchase.select(purchase_id);
-        if (purchase != null && purchase_status_isReceive(purchase)) {
-          // if exists update purchase in post aka leger
-          d_post.update(post_type_id: purchase_status, identifier: purchase_id, total: d_purchase.total(purchase_id));
+        // properties can be changed to something you want
+        d_purchase.update(pur);
 
+        // storing the entity type we what to update in post aka leger
+        int post_type_id = (int)DataAccess.post_type.Purchase;
+
+        // get purchase from post aka leger if exists
+        Model.Entities.post post = d_post.select(post_type_id, identifier: purchase_id);
+        if (post != null) {
+
+          // change post properties 
+          post.crebit = d_purchase.total(pur.purchase_id);
+
+
+          d_post.update(post);
+
+        } else {
+          System.Diagnostics.Debug.WriteLine($" cannot find purchase entry in post collection ");
         }
 
+      } else {
+        System.Diagnostics.Debug.WriteLine($" cannot find purchase entry in purchase collection ");
       }
 
     }
     public void purchase_postInsert(int purchase_id = 1) {
+
+      // storing the type of post 
       int purchase_post_type = (int)DataAccess.post_type.Purchase;
 
       // only purchase that have status "receive" is added to post 
@@ -402,65 +487,122 @@ namespace Learning.ConsoleApp {
 
     }
     public void payment_update(int payment_id) {
-      int cash = (int)DataAccess.payment_method.Cash;
-      Model.Entities.payment p = new Model.Entities.payment() {
-        account_id = 1,
-        id = payment_id,
-        payment_method_id = cash,
-        date = DateTime.Parse("5-May-20"),
-        amount = 5555.55m,
-      };
 
-      d_payment.update(p);
+      // getting payment 
+      Model.Entities.payment payment = d_payment.select(payment_id);
 
-      // update payment information in post if exists
-      int post_type = (int)DataAccess.post_type.Payment;
-      Model.Entities.post post = new Model.Entities.post() {
-        post_type_id = post_type,
-        identifier = p.id,
-        account_id = p.account_id,
-        log = DateTime.Parse("7-May-20"),
-        crebit = 0.0m,
-        debit = p.amount,
-        description = $"payment { p.amount } in cash"
-      };
+      if (payment != null) {
 
-      d_post.update(post);
-    }
-    public void payment_delete(int payment_id) {
-      // delete it from post if exists
-      int payment = (int)DataAccess.post_type.Payment;
-      d_post.delete(payment, payment_id);
-      d_payment.delete(payment_id);
-    }
-    public void payment_postInsert(int payment_id) {
-      Model.Entities.payment p = d_payment.select(payment_id);
+        // storing the type of payment
+        int cash = (int)DataAccess.payment_method.Cash;
 
-      int ty_payment = (int)DataAccess.post_type.Payment;
+        // modifying properties
+        payment.amount = 25m;
+        payment.date = DateTime.Parse("5-May-20");
+        payment.payment_method_id = cash;
 
-      Model.Entities.post post = d_post.select(ty_payment, payment_id);
+        // calling update method to update payment
+        d_payment.update(payment);
 
-      if (p != null && post == null) {
-        d_post.insert(new Model.Entities.post() {
-          log = DateTime.Now,
-          account_id = p.account_id,
-          identifier = p.id,
-          description = string.Empty,
-          post_type_id = ty_payment,
-          crebit = 0.0M,
-          debit = p.amount
-        });
+        // update payment information in post if exists
+        int post_type = (int)DataAccess.post_type.Payment;
+
+        // getting payment's post if already exists, to update
+        Model.Entities.post post = d_post.select(post_type, payment.id);
+
+        if (post != null) {
+
+          // properties you want to change, usually amount in post 
+          post.debit = payment.amount;
+
+          // updating payment properties
+          d_post.update(post);
+
+        } else {
+          System.Diagnostics.Debug.WriteLine($" no entry was found of payment in post with following id { payment.id }");
+        }
+
+      } else {
+        System.Diagnostics.Debug.WriteLine($" no entry was found of payment in payments with following id { payment_id }");
       }
 
 
+
+
     }
-    public void payment_postDelete(int payment_id) {
-      int status = (int)DataAccess.post_type.Payment;
+    public void payment_delete(int payment_id) {
+      // getting payment 
       Model.Entities.payment payment = d_payment.select(payment_id);
       if (payment != null) {
-        d_post.delete(status, payment_id);
+        d_payment.delete(payment);
+
+        // delete it from post if exists
+        int post_type = (int)DataAccess.post_type.Payment;
+        Model.Entities.post post = d_post.select(post_type, payment_id);
+        if (post != null) {
+          d_post.delete(post);
+        } else {
+          Debug.WriteLine($"cannot delete payment in post collection");
+        }
+
       } else {
-        //log; no such payment is exists
+        Debug.WriteLine($"cannot delete payment in payment collection");
+      }
+
+    }
+    public void payment_postInsert(int payment_id) {
+
+      // get payment to post
+      Model.Entities.payment p = d_payment.select(payment_id);
+
+      if (p != null) {
+
+        // store post's type 
+        int ty_payment = (int)DataAccess.post_type.Payment;
+
+        // get post of payment
+        Model.Entities.post post = d_post.select(ty_payment, payment_id);
+
+        // check, payment is not already posted
+        if (post == null) {
+          d_post.insert(new Model.Entities.post() {
+            log = DateTime.Now,
+            account_id = p.account_id,
+            identifier = p.id,
+            description = string.Empty,
+            post_type_id = ty_payment,
+            crebit = 0.0M,
+            debit = p.amount
+          });
+        } else {
+          Debug.WriteLine($"payment already posted in post's collection");
+        }
+      } else {
+        Debug.WriteLine($"cannot find payment in payment's collection");
+      }
+
+    }
+    public void payment_postDelete(int payment_id) {
+
+      // storing status
+      int status = (int)DataAccess.post_type.Payment;
+
+      // get the payment in payment's collection
+      Model.Entities.payment payment = d_payment.select(payment_id);
+
+      if (payment != null) {
+
+        // get the post in post collection
+        Model.Entities.post post = d_post.select(status, payment_id);
+
+        if (post != null) {
+          d_post.delete(post);
+        } else {
+          Debug.WriteLine($"cannot find the post in post's collection");
+        }
+
+      } else {
+        Debug.WriteLine($"cannot find the payment in payment's collection");
       }
     }
     #endregion
@@ -519,22 +661,48 @@ namespace Learning.ConsoleApp {
 
     }
     public void inventory_purchaseItemDelete(int purchase_id, int product_id) {
+      System.Diagnostics.Debug.WriteLine($"executing inventory_purchaseItemDelete function");
 
-      // check for PurchaseItem that it belongs to respective purchase or not
-      Model.Entities.purchase_item temp = d_purchase_Item.select(purchase_id, product_id);
+      // get the purchase 
+      Model.Entities.purchase purchase = d_purchase.select(purchase_id);
 
-      // get the purchase for that purchase item
-      Model.Entities.purchase purchase = d_purchase.select(temp.purchase_id);
+      // check purchase's status, should not be "received"
+      bool IsApprove = purchase_status_IsApprove(purchase);
 
-      // once found delete it from inventory if exists
-      if (temp != null) {
-        if (purchase != null && purchase_status_IsApprove(purchase)) {
-          d_inventory.delete(temp);
+      // make condition
+      bool goodToGo = purchase != null && IsApprove;
+
+      if (goodToGo) {
+
+        // check for PurchaseItem that it belongs to respective purchase or not
+        Model.Entities.purchase_item purchase_item = d_purchase_Item.select(purchase_id, product_id);
+
+        if (purchase_item != null) {
+
+          // check purchase's item is in inventory already ?
+          Model.Entities.inventory inventory = d_inventory.select(purchase_id, product_id);
+
+          if (inventory != null) {
+
+            // deleting inventory from inventory
+            d_inventory.delete(inventory);
+
+            // we now need to change the status of purchase_item's inventoried property to false
+            purchase_item.inventoried = false;
+            d_purchase_Item.update(purchase_item);
+
+          } else {
+            System.Diagnostics.Debug.WriteLine($"cannot find the purchase item in inventory");
+          }
+
+        } else {
+          System.Diagnostics.Debug.WriteLine($"cannot find the requested purchase item in inventory");
         }
 
       } else {
-        // log; purchase_item not found
+        System.Diagnostics.Debug.WriteLine($"either purchase is null or not approved");
       }
+
     }
     #endregion
 
@@ -542,7 +710,7 @@ namespace Learning.ConsoleApp {
       r_category.select();
       r_supplier.select();
       r_product.select();
-      r_account.select(); 
+      r_account.select();
       r_purchase.select();
       r_inventory.select();
       r_payment.select();

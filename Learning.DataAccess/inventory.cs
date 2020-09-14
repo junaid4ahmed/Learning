@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity.Infrastructure;
+using System.Data.Entity.Validation;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -8,63 +11,66 @@ namespace Learning.DataAccess {
   public class inventory
     : Base {
     public inventory() { }
-    public Model.Entities.inventory select(int id) {
-      Model.Entities.inventory inventory = _context.Inventories.Find(new object[] { id });
+    public Model.Entities.inventory select(int inventory_id) {
+      Model.Entities.inventory inventory = _context.Inventories.Find(new object[] { inventory_id });
       return inventory;
     }
-
     public Model.Entities.inventory select(int purchase_id, int product_id) {
       Model.Entities.inventory temp =
         _context.Inventories.SingleOrDefault(i => i.purchase_id == purchase_id && i.product_id == product_id);
       return temp;
     }
-
     public bool insert(Model.Entities.inventory inventory) {
-
       bool result = false;
       try {
         _context.Inventories.Add(inventory);
         _context.SaveChanges();
         result = true;
-      } catch (System.Data.Entity.Infrastructure.DbUpdateException) {
-        // log; cannot insert inventory
-      }
-      return result;
-    }
-
-    public bool update(Model.Entities.purchase_item item) {
-      bool result = false;
-
-      // find the inventory from purchase_id product_id in purchase section
-      Model.Entities.inventory inventory = select(item.purchase_id, item.product_id);
-      if (inventory != null) {
-        try {
-          inventory.price = item.unit_cast;
-          inventory.quantity = item.quantity;
-          inventory.modift = DateTime.Now;
-          _context.SaveChanges();
-          result = true;
-        } catch (System.Data.Entity.Infrastructure.DbUpdateException) {
-          // log; cannot update the inventory
+      } catch (DbEntityValidationException exc) {
+        Debug.WriteLine($"cannot insert inventory in inventory's collection");
+        foreach (DbEntityValidationResult errors in exc.EntityValidationErrors) {
+          foreach (DbValidationError item in errors.ValidationErrors) {
+            Debug.WriteLine($"{ item.PropertyName }");
+            Debug.WriteLine($"{ item.ErrorMessage }");
+          }
         }
+      } catch (DbUpdateException exc) {
+        Debug.WriteLine($"cannot insert inventory in inventory's collection ");
+        Debug.Write($"{ exc.InnerException.InnerException.Message }");
       }
       return result;
     }
-
-    public bool delete(Model.Entities.purchase_item item) {
+    public bool update(Model.Entities.inventory inventory) {
       bool result = false;
-      // make sure purchase_item exist in inventory already
-      Model.Entities.inventory temp = select(item.purchase_id, item.product_id);
-      if (temp != null) {
-        _context.Inventories.Remove(temp);
-
-        // set purchase_item inventoried property to false upon delete into inventory
-        item.inventoried = false;
-        result = true;
+      try {
+        _context.Entry(entity: inventory).State = System.Data.Entity.EntityState.Modified;
         _context.SaveChanges();
-      } else {
-        // log; purchase_item not found
+        result = true;
+      } catch (DbEntityValidationException exc) {
+        Debug.WriteLine($"cannot update inventory in inventory's collection");
+        foreach (DbEntityValidationResult errors in exc.EntityValidationErrors) {
+          foreach (DbValidationError error in errors.ValidationErrors) {
+            Debug.WriteLine($"{ error.PropertyName }");
+            Debug.WriteLine($"{ error.ErrorMessage }");
+          }
+        }
+      } catch (DbUpdateException exc) {
+        Debug.WriteLine($" cannot update inventory in inventory's collection");
+        Debug.WriteLine($"{ exc.InnerException.InnerException.Message  }");
       }
+      return result;
+    }
+    public bool delete(Model.Entities.inventory inventory) {
+      bool result = false;
+      try {
+        _context.Inventories.Remove(inventory);
+        _context.SaveChanges();
+        result = true;
+      } catch (DbUpdateException exc) {
+        Debug.WriteLine($" cannot delete inventory in inventory's collection");
+        Debug.Write($" { exc.InnerException.InnerException.Message } ");
+      }
+
       return result;
     }
 

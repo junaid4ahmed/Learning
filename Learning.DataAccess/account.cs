@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity.Infrastructure;
+using System.Data.Entity.Validation;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,40 +21,50 @@ namespace Learning.DataAccess {
         _context.Accounts.Add(account);
         _context.SaveChanges();
         result = true;
-      } catch (System.Data.Entity.Infrastructure.DbUpdateException) {
-        // log; cannot insert the account
+      } catch (DbEntityValidationException exc) {
+        Debug.WriteLine($"cannot insert account in account's collection");
+        foreach (DbEntityValidationResult errors in exc.EntityValidationErrors) {
+          foreach (DbValidationError item in errors.ValidationErrors) {
+            Debug.WriteLine($"{ item.PropertyName }");
+            Debug.WriteLine($"{ item.ErrorMessage }");
+          }
+        }
+      } catch (DbUpdateException exc) {
+        Debug.WriteLine($"cannot insert account in accounts collection");
+        Debug.WriteLine($"{ exc.InnerException.InnerException.Message }");
       }
       return result;
     }
     public bool update(Model.Entities.account account) {
       bool result = false;
-      Model.Entities.account temp = select(account.id);
-      if (temp != null) {
-        try {
-          temp.account_type_id = account.account_type_id;
-          temp.name = account.name;
-          temp.address = account.address;
-          temp.phone = account.phone;
-          _context.SaveChanges();
-
-          result = true;
-        } catch (System.Data.Entity.Infrastructure.DbUpdateException) {
-          // log; cannot update the account
-        }
-      } else {
-        // log; cannot find the account
-      }
-      return result;
-    }
-    public bool delete(int account_id) {
-      bool result = false;
-      Model.Entities.account temp = select(account_id);
-      if (temp != null) {
-        _context.Accounts.Remove(temp);
+      try {
+        _context.Entry(account).State = System.Data.Entity.EntityState.Modified;
         _context.SaveChanges();
         result = true;
-      } else {
-        // log; cannot delete the account;
+      } catch (DbEntityValidationException exc) {
+        Debug.WriteLine($"cannot update account in account's collection");
+        foreach (DbEntityValidationResult errors in exc.EntityValidationErrors) {
+          foreach (DbValidationError item in errors.ValidationErrors) {
+            Debug.WriteLine($"{ item.PropertyName }");
+            Debug.WriteLine($"{ item.ErrorMessage }");
+          }
+        }
+      } catch (DbUpdateException exc) {
+        Debug.WriteLine($"cannot update account in account's collection");
+        Debug.WriteLine($" { exc.InnerException.InnerException.Message } ");
+      }
+
+      return result;
+    }
+    public bool delete(Model.Entities.account account) {
+      bool result = false;
+      try {
+        _context.Accounts.Remove(account);
+        _context.SaveChanges();
+        result = true;
+      } catch (DbUpdateException exc) {
+        Debug.WriteLine($"cannot delete account in account's collection");
+        Debug.WriteLine($"{ exc.InnerException.InnerException.Message }");
       }
       return result;
     }

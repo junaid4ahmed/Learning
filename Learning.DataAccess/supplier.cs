@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity.Infrastructure;
+using System.Data.Entity.Validation;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,46 +23,50 @@ namespace Learning.DataAccess {
         _context.Suppliers.Add(supplier);
         _context.SaveChanges();
         result = true;
-      } catch (System.Data.Entity.Infrastructure.DbUpdateException) {
-        // log; cannot insurt the supplier
+      } catch (DbEntityValidationException exc) {
+        Debug.WriteLine($"cannot insert supplier in supplier's collection");
+        foreach (DbEntityValidationResult errors in exc.EntityValidationErrors) {
+          foreach (DbValidationError item in errors.ValidationErrors) {
+            Debug.WriteLine($"{ item.PropertyName }");
+            Debug.WriteLine($"{ item.ErrorMessage }");
+          }
+        }
+      } catch (DbUpdateException exc) {
+        Debug.WriteLine($"cannot insert supplier in supplier's collection");
+        Debug.WriteLine($"{ exc.InnerException.InnerException.Message }");
       }
       return result;
     }
     public bool update(Model.Entities.supplier supplier) {
       bool result = false;
-      Model.Entities.supplier temp = select(supplier.supplier_id);
-      if (temp != null) {
-        try {
-          temp.first_name = supplier.first_name;
-          temp.last_name = supplier.last_name;
-          temp.email = supplier.email;
-          temp.company = supplier.company;
-          temp.business_phone = supplier.business_phone;
-          temp.home_phone = supplier.home_phone;
-          temp.address = supplier.address;
-          temp.city = supplier.city;
-          temp.state = supplier.state;
-          temp.zip = supplier.zip;
-          temp.notes = supplier.notes;
-          _context.SaveChanges();
-          result = true;
-        } catch (System.Data.Entity.Infrastructure.DbUpdateException) {
-          // log; cannot update the supplier
+      try {
+        _context.Entry(supplier).State = System.Data.Entity.EntityState.Modified;
+        _context.SaveChanges();
+        result = true;
+      } catch (DbEntityValidationException exc) {
+        Debug.WriteLine($"cannot update supplier in supplier's collection");
+        foreach (DbEntityValidationResult errors in exc.EntityValidationErrors) {
+          foreach (DbValidationError item in errors.ValidationErrors) {
+            Debug.WriteLine($"{ item.PropertyName }");
+            Debug.WriteLine($"{ item.ErrorMessage }");
+          }
         }
-      } else {
-        // log; cannot find the supplier for update
+      } catch (DbUpdateException exc) {
+        Debug.WriteLine($"cannot update supplier in supplier's collection");
+        Debug.WriteLine($" { exc.InnerException.InnerException.Message } ");
       }
+
       return result;
     }
-    public bool delete(int supplier_id) {
+    public bool delete(Model.Entities.supplier supplier) {
       bool result = false;
-      Model.Entities.supplier supplier = select(supplier_id);
-      if (supplier != null) {
+      try {
         _context.Suppliers.Remove(supplier);
         _context.SaveChanges();
         result = true;
-      } else {
-        // log; cannot find the require supplier
+      } catch (DbUpdateException exc) {
+        Debug.WriteLine($"cannot delete supplier in supplier's collection");
+        Debug.WriteLine($"{ exc.InnerException.InnerException.Message }");
       }
       return result;
     }

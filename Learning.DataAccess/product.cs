@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity.Infrastructure;
+using System.Data.Entity.Validation;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,44 +22,50 @@ namespace Learning.DataAccess {
         _context.Products.Add(product);
         _context.SaveChanges();
         result = true;
-      } catch (System.Data.Entity.Infrastructure.DbUpdateException) {
-        // log; cannot insert the product
+      } catch (DbEntityValidationException exc) {
+        Debug.WriteLine($"cannot insert product in product's collection");
+        foreach (DbEntityValidationResult errors in exc.EntityValidationErrors) {
+          foreach (DbValidationError item in errors.ValidationErrors) {
+            Debug.WriteLine($"{ item.PropertyName }");
+            Debug.WriteLine($"{ item.ErrorMessage }");
+          }
+        }
+      } catch (DbUpdateException exc) {
+        Debug.WriteLine($"cannot insert product in product's collection");
+        Debug.WriteLine(exc.InnerException.InnerException.Message);
       }
       return result;
     }
     public bool update(Model.Entities.product product) {
       bool result = false;
-      Model.Entities.product temp = select(product.product_id);
-      if (temp != null) {
-        try {
-          temp.name = product.name;
-          temp.code = product.code;
-          temp.standard_cast = product.standard_cast;
-          temp.list_price = product.list_price;
-          temp.recoder_level = product.recoder_level;
-          temp.traget_level = product.traget_level;
-          temp.quantity_per_unit = product.quantity_per_unit;
-          temp.discontinued = product.discontinued;
-          temp.insert_date = product.insert_date;
-          temp.category_id = product.category_id;
-          _context.SaveChanges();
-          result = true;
-        } catch (System.Data.Entity.Infrastructure.DbUpdateException) {
-          // log; cannot update the product
+      try {
+        _context.Entry(product).State = System.Data.Entity.EntityState.Modified;
+        _context.SaveChanges();
+        result = true;
+      } catch (DbEntityValidationException exc) {
+        Debug.WriteLine($"cannot update product in product's collection");
+        foreach (DbEntityValidationResult errors in exc.EntityValidationErrors) {
+          foreach (DbValidationError item in errors.ValidationErrors) {
+            Debug.WriteLine($"{ item.PropertyName }");
+            Debug.WriteLine($"{ item.ErrorMessage }");
+          }
         }
-      } else {
-        // log; cannot find the product for update
+      } catch (DbUpdateException exc) {
+        Debug.WriteLine($"cannot update product in product's collection");
+        Debug.WriteLine(exc.InnerException.InnerException.Message);
       }
+
       return result;
     }
-    public bool delete(int product_id) {
+    public bool delete(Model.Entities.product product) {
       bool result = false;
-      Model.Entities.product product = select(product_id);
-      if (product != null) {
+      try {
         _context.Products.Remove(product);
         _context.SaveChanges();
-      } else {
-        // log; cannot delete teh product
+        result = true;
+      } catch (DbUpdateException exc) {
+        Debug.WriteLine($"cannot delete product in product's collection");
+        Debug.WriteLine($"{exc.InnerException.InnerException.Message}");
       }
       return result;
     }
